@@ -8,9 +8,10 @@ class App extends Component {
     this.state = {
       inputValue: [],
       firstPlayer: '',
-      buttonClicked: true
+      buttonClicked: true,
     }
     this.toggleView = this.toggleView.bind(this);
+    this.handlePacks = this.handlePacks.bind(this);
     //this.handleChange = this.handleChange.bind(this);
   }
 
@@ -24,13 +25,14 @@ class App extends Component {
       .then((data) => {
         this.setState({
           inputValue: data.players,
-          firstPlayer: data.firstPlayer
+          firstPlayer: data.firstPlayer,
         })
       })
       .catch(error => console.log(error)); // eslint-disable-line no-console 
   }
 
   toggleView(event) {
+    event.preventDefault();
     this.setState({
       buttonClicked: !this.state.buttonClicked
     });
@@ -42,13 +44,31 @@ class App extends Component {
   //   });
   // }
 
+  handlePacks(event) {
+    event.preventDefault();
+    let url = "http://127.0.0.1:5000/api/v1" + event.target.className;
+    console.log(url);
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) throw Error(response.statusText);
+        return response.json();
+      })
+      .then((data) => {
+        this.setState({
+          inputValue: data.players,
+          firstPlayer: data.firstPlayer,
+        })
+      })
+      .catch(error => console.log(error)); // eslint-disable-line no-console 
+  }
+
   render () {
     let players = this.state.inputValue.map((data,index) => 
-      <Card key={index} word={data[0]} displayColor={data[1]} cardColor={data[1]} />
+      <Card key={index} word={data[0]} displayColor={data[1]} cardColor={data[1]} beenClicked={false} />
     )
 
     let defaultCards = this.state.inputValue.map((data,index) =>
-      <Card key={index} word={data[0]} displayColor={"tan"} cardColor={data[1]} />
+      <Card key={index} word={data[0]} displayColor={"tan"} cardColor={data[1]} beenClicked={false}/>
     )
 
     return (
@@ -99,8 +119,18 @@ class App extends Component {
             }
           </div>
           <div style={styles.bottomHalf}>
+            <div style={styles.packContainer}>
+              <ul style={styles.packs}>
+                <li className="/Default" onClick={this.handlePacks}>Default</li>
+                <li className="/Premier_League" onClick={this.handlePacks}>Premier League</li>
+                <li className="/Clear" onClick={this.clearBoard}>Clear Board</li>
+                <li className="/Sports_Teams" onClick={this.handlePacks}>Sports Teams</li>
+                <li className="/NSFW" onClick={this.handlePacks}>NSFW</li>
+                <li className="/Create_Pack" onClick={this.handlePacks}>Create Pack</li>
+              </ul>
+            </div>
             <div style={styles.button} onClick={this.toggleView} className="toggle-view">
-              <h1>Toggle View</h1>
+              <h1>Toggle Colors</h1>
             </div>
           </div>
         </div>
@@ -178,20 +208,36 @@ const styles = {
   },
   button: {
     display: "flex",
-    flexDirection: "row",
     backgroundColor: "white",
-    width: "40%",
-    height: "80%",
+    width: "35%",
+    height: "60%",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: "50%",
-    boxShadow: "100px"
+    boxShadow: "3px 3px",
+    cursor: "pointer",
   },
   blueColor: {
     backgroundColor: "#6b68ff"
   },
   redColor: {
     backgroundColor: "#ff4e47"
+  },
+  packContainer: {
+    display: "flex",
+    width: "60%",
+    height: "100%"
+  },
+  packs: {
+    display: "flex",
+    flexFlow: "row wrap",
+    justifyContent: "space-around",
+    alignItems: "stretch",
+    listStyle: "none",
+    width: "100%",
+    height: "80%",
+    marginRight: "5%",
+    cursor: "pointer",
+    paddingLeft: "0",
   }
 };
 

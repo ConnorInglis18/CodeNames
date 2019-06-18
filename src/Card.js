@@ -84,7 +84,8 @@ const styles = {
         justifyContent: "center",
         fontWeight: "bold",
         borderRadius: "10%",
-        textAlign: "center"
+        textAlign: "center",
+        cursor: "pointer",
     },
     tanColor: {
         backgroundColor: "tan",

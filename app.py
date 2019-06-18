@@ -1,8 +1,8 @@
-from flask import Flask
-from flask import jsonify 
+from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 import random
 import numpy as np
+import os
 #import requests
 
 app = Flask(__name__)
@@ -18,7 +18,7 @@ def randomColor():
         return {"first": "blue",
                 "second": "red"}
 
-def get25Players(firstPlayer):
+def get25Players(firstPlayer, packName):
     colorArray = []
 
     # add colors to color array
@@ -37,7 +37,8 @@ def get25Players(firstPlayer):
     allWords = []
     wordsSet = set()
 
-    with open("codenamesWords.txt", 'r') as in_file:
+    fileName = os.path.join("WordPacks", packName + ".txt")
+    with open(fileName, 'r') as in_file:
         #allPlayers = in_file.readline().split(',')
         allWords = in_file.readlines()
 
@@ -58,28 +59,25 @@ def get25Players(firstPlayer):
 @app.route("/api/v1/", methods=["GET"])
 def generateSinglePlayerGame():
     firstPlayer = randomColor()
-    players = get25Players(firstPlayer)
+    players = get25Players(firstPlayer, 'Default')
     context = {}
     context["firstPlayer"] = firstPlayer["first"]
     context["players"] = players
     return jsonify(**context)
 
 
-# @app.route("/api/v1/<int:gameKey>", methods=["GET", "POST"])
-# def generateMultiplayerGame(gameKey):
-#     if flask.request.method == 'POST':
-#         flask.make_response(jsonify(**context), 201)
-#     else:
-#         if gameKey in GAMES:
-#             context = GAMES["gameKey"]
-#             return jsonify(**context)
-#         firstPlayer = randomColor()
-#         players = get25Players(firstPlayer)
-#         context = {}
-#         context["firstPlayer"] = firstPlayer["first"]
-#         context["players"] = players
-#         GAMES["gameKey"] = context
-#         return jsonify(**context)
+@app.route("/api/v1/<string:packName>", methods=["GET", "POST"])
+def generateMultiplayerGame(packName):
+    if request.method == 'POST':
+        context = {}
+        make_response(jsonify(**context), 201)
+    else:
+        firstPlayer = randomColor()
+        players = get25Players(firstPlayer, packName)
+        context = {}
+        context["firstPlayer"] = firstPlayer["first"]
+        context["players"] = players
+        return jsonify(**context)
 
 # @app.route("/api/v1/users", methods=["GET"])
 # def users():
