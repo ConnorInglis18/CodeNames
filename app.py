@@ -34,26 +34,52 @@ def get25Players(firstPlayer):
     # generate a random permutation of the color array
     colorArray = np.random.permutation(colorArray)
     
-    allPlayers = []
-    playersSet = set()
+    allWords = []
+    wordsSet = set()
 
-    with open("wordlist.txt", 'r') as in_file:
-        allPlayers = in_file.readline().split(',')
+    with open("codenamesWords.txt", 'r') as in_file:
+        #allPlayers = in_file.readline().split(',')
+        allWords = in_file.readlines()
 
-    while len(playersSet) < 25:
-        playersSet.add((allPlayers[random.randint(0,len(allPlayers)-1)], colorArray[len(playersSet)]))
+    while len(wordsSet) < 25:
+        wordsSet.add((allWords[random.randint(0,len(allWords)-1)]))
 
-    return list(playersSet)
+    wordsSet = list(wordsSet)
+    returnedElements = []
+    for i in range(0,len(wordsSet)):
+        returnedElements.append([wordsSet[i].strip(),colorArray[i]])
+
+    return returnedElements
+
+
+# GAMES = {}
     
 
 @app.route("/api/v1/", methods=["GET"])
-def helloWorld():
+def generateSinglePlayerGame():
     firstPlayer = randomColor()
     players = get25Players(firstPlayer)
     context = {}
     context["firstPlayer"] = firstPlayer["first"]
     context["players"] = players
     return jsonify(**context)
+
+
+# @app.route("/api/v1/<int:gameKey>", methods=["GET", "POST"])
+# def generateMultiplayerGame(gameKey):
+#     if flask.request.method == 'POST':
+#         flask.make_response(jsonify(**context), 201)
+#     else:
+#         if gameKey in GAMES:
+#             context = GAMES["gameKey"]
+#             return jsonify(**context)
+#         firstPlayer = randomColor()
+#         players = get25Players(firstPlayer)
+#         context = {}
+#         context["firstPlayer"] = firstPlayer["first"]
+#         context["players"] = players
+#         GAMES["gameKey"] = context
+#         return jsonify(**context)
 
 # @app.route("/api/v1/users", methods=["GET"])
 # def users():

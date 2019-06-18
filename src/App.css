@@ -31,3 +31,30 @@
     transform: rotate(360deg);
   }
 }
+
+.container {
+  width: 80%;
+  height: 85vw;
+  background-color: lightgrey;
+}
+
+.toggle-view {
+  font-size: 2.0vw;
+}
+
+@media (min-width: 1000px) {
+  .container {
+    width: 800px;
+    height: 95vh;
+    background-color: lightgrey;
+  }
+  .toggle-view {
+    font-size: 20px;
+  }
+}
+/* 
+@media (min-height: 500px) {
+  .container {
+    height: 95%;
+  }
+} */

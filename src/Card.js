@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './Card.css'
 
 class Card extends Component {
     constructor(props) {
@@ -6,29 +7,68 @@ class Card extends Component {
         this.state = {
             beenClicked: false
         }
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick(event) {
+        this.setState({
+            beenClicked: !this.state.beenClicked
+        });
     }
 
     render() {
         return(
-            this.props.color == "tan"
+            (this.state.beenClicked === true && this.props.cardColor === "tan")
             ?
-            <div style={Object.assign({}, styles.card, styles.tanColor)}>
+            <div onClick={this.handleClick} className="card"
+            style={Object.assign({}, styles.card, styles.clickedTanColor)}>
                 {this.props.word}
             </div>
             :
-            this.props.color == "blue"
+            (this.state.beenClicked === true && this.props.cardColor === "blue")
             ?
-            <div style={Object.assign({}, styles.card, styles.blueColor)}>
+            <div onClick={this.handleClick} className="card"
+            style={Object.assign({}, styles.card, styles.clickedBlueColor)}>
                 {this.props.word}
             </div>
             :
-            this.props.color == "red"
+            (this.state.beenClicked === true && this.props.cardColor === "red")
             ?
-            <div style={Object.assign({}, styles.card, styles.redColor)}>
+            <div onClick={this.handleClick} className="card"
+            style={Object.assign({}, styles.card, styles.clickedRedColor)}>
                 {this.props.word}
             </div>
             :
-            <div style={Object.assign({}, styles.card, styles.blackColor)}>
+            (this.state.beenClicked === true && this.props.cardColor === "black")
+            ?
+            <div onClick={this.handleClick} className="card"
+            style={Object.assign({}, styles.card, styles.clickedBlackColor)}>
+                {this.props.word}
+            </div>
+            :
+            this.props.displayColor === "tan"
+            ?
+            <div onClick={this.handleClick} className="card"
+            style={Object.assign({}, styles.card, styles.tanColor)}>
+                {this.props.word}
+            </div>
+            :
+            this.props.displayColor === "blue"
+            ?
+            <div onClick={this.handleClick} className="card"
+            style={Object.assign({}, styles.card, styles.blueColor)}>
+                {this.props.word}
+            </div>
+            :
+            this.props.displayColor === "red"
+            ?
+            <div onClick={this.handleClick} className="card"
+            style={Object.assign({}, styles.card, styles.redColor)}>
+                {this.props.word}
+            </div>
+            :
+            <div onClick={this.handleClick} className="card"
+            style={Object.assign({}, styles.card, styles.blackColor)}>
                 {this.props.word}
             </div>
         )
@@ -42,24 +82,42 @@ const styles = {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        color: "black",
-        fontSize: "2.1vw",
         fontWeight: "bold",
         borderRadius: "10%",
         textAlign: "center"
     },
     tanColor: {
-        backgroundColor: "tan"
+        backgroundColor: "tan",
+        color: "black"
+    },
+    clickedTanColor: {
+        backgroundColor: "#936a39",
+        color: "#936a39"
     },
     blueColor: {
-        backgroundColor: "#6b68ff"
+        backgroundColor: "#6b68ff",
+        color: "white"
+    },
+    clickedBlueColor: {
+        backgroundColor: "#0400ff",
+        color: "#0400ff"
     },
     redColor: {
-        backgroundColor: "#ff4e47"
+        backgroundColor: "#ff4e47",
+        color: "white"
+    },
+    clickedRedColor: {
+        backgroundColor: "#e60800",
+        color: "#e60800"
     },
     blackColor: {
-        backgroundColor: "grey"
-    }
+        backgroundColor: "grey",
+        color: "black"
+    },
+    clickedBlackColor: {
+        backgroundColor: "black",
+        color: "black"
+    },
   };
 
 export default Card;

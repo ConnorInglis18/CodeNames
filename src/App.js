@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-import GetInput from './GetInput.js';
-import RenderInput from './RenderInput.js';
-import Player from './Player.js';
 import Card from './Card.js';
 
 class App extends Component {
@@ -21,7 +18,6 @@ class App extends Component {
     // Call REST API to get number of likes
     fetch("http://127.0.0.1:5000/api/v1/")
       .then((response) => {
-        console.log(response)
         if (!response.ok) throw Error(response.statusText);
         return response.json();
       })
@@ -47,13 +43,12 @@ class App extends Component {
   // }
 
   render () {
-    console.log(this.state.inputValue);
     let players = this.state.inputValue.map((data,index) => 
-      <Card key={index} word={data[0]} color={data[1]} />
+      <Card key={index} word={data[0]} displayColor={data[1]} cardColor={data[1]} />
     )
 
     let defaultCards = this.state.inputValue.map((data,index) =>
-      <Card key={index} word={data[0]} color={"tan"} />
+      <Card key={index} word={data[0]} displayColor={"tan"} cardColor={data[1]} />
     )
 
     return (
@@ -65,21 +60,21 @@ class App extends Component {
       //  <Player name={"Rashford"} points={15} />
       // </div>
       <div style={styles.screen}>
-        <div style={styles.container}>
+        <div className="container">
           <div style={styles.topHalf}>
-            {this.state.firstPlayer == "blue"
+            {this.state.firstPlayer === "blue"
             ?
             <div style={Object.assign({}, styles.topBar, styles.blueColor)}></div>
             :
             <div style={Object.assign({}, styles.topBar, styles.redColor)}></div>
             }
-            {this.state.firstPlayer == "blue"
+            {this.state.firstPlayer === "blue"
             ?
             <div style={Object.assign({}, styles.leftBar, styles.blueColor)}></div>
             :
             <div style={Object.assign({}, styles.leftBar, styles.redColor)}></div>
             }
-            {this.state.buttonClicked == true
+            {this.state.buttonClicked === true
             ?
             <div style={styles.cards}>
               {players}
@@ -90,13 +85,13 @@ class App extends Component {
             </div>
             }
             
-            {this.state.firstPlayer == "blue"
+            {this.state.firstPlayer === "blue"
             ?
             <div style={Object.assign({}, styles.rightBar, styles.blueColor)}></div>
             :
             <div style={Object.assign({}, styles.rightBar, styles.redColor)}></div>
             }
-            {this.state.firstPlayer == "blue"
+            {this.state.firstPlayer === "blue"
             ?
             <div style={Object.assign({}, styles.bottomBar, styles.blueColor)}></div>
             :
@@ -104,7 +99,7 @@ class App extends Component {
             }
           </div>
           <div style={styles.bottomHalf}>
-            <div style={styles.button} onClick={this.toggleView}>
+            <div style={styles.button} onClick={this.toggleView} className="toggle-view">
               <h1>Toggle View</h1>
             </div>
           </div>
@@ -122,11 +117,6 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center"
-  },
-  container: {
-    height: "95%",
-    width: "80%",
-    backgroundColor: "lightGrey"
   },
   topHalf: {
     display: "flex",
@@ -195,14 +185,13 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "50%",
-    fontSize: "2.2vw",
     boxShadow: "100px"
   },
   blueColor: {
     backgroundColor: "#6b68ff"
   },
   redColor: {
-      backgroundColor: "#ff4e47"
+    backgroundColor: "#ff4e47"
   }
 };
 
