@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import './Card.css'
+import '../Static/css/Card.css';
 
 class Card extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            beenClicked: false
+            beenClicked: this.props.beenClicked
         }
         this.handleClick = this.handleClick.bind(this);
     }
@@ -77,8 +77,8 @@ class Card extends Component {
 
 const styles = {
     card: {
-        width: "18%",
-        height: "18%",
+        width: "12%",
+        height: "12%",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -86,6 +86,7 @@ const styles = {
         borderRadius: "10%",
         textAlign: "center",
         cursor: "pointer",
+        padding: "3%"
     },
     tanColor: {
         backgroundColor: "tan",

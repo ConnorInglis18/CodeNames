@@ -53,16 +53,23 @@ def get25Players(firstPlayer, packName):
     return returnedElements
 
 
-# GAMES = {}
+def getWordPacks():
+    path = 'WordPacks'
+    files = []
+    for _,_,f in os.walk(path):
+        for file in f:
+            if '.txt' in file:
+                files.append(file.split(".")[0])
+    return files
     
 
 @app.route("/api/v1/", methods=["GET"])
 def generateSinglePlayerGame():
-    firstPlayer = randomColor()
-    players = get25Players(firstPlayer, 'Default')
     context = {}
+    firstPlayer = randomColor()
     context["firstPlayer"] = firstPlayer["first"]
-    context["players"] = players
+    context["players"] = get25Players(firstPlayer, 'Default')
+    context["wordPacks"] = getWordPacks()
     return jsonify(**context)
 
 
@@ -77,6 +84,7 @@ def generateMultiplayerGame(packName):
         context = {}
         context["firstPlayer"] = firstPlayer["first"]
         context["players"] = players
+        context["wordPacks"] = getWordPacks()
         return jsonify(**context)
 
 # @app.route("/api/v1/users", methods=["GET"])
