@@ -86,7 +86,8 @@ const styles = {
         borderRadius: "10%",
         textAlign: "center",
         cursor: "pointer",
-        padding: "3%"
+        padding: "3%",
+        userSelect: "none",
     },
     tanColor: {
         backgroundColor: "tan",

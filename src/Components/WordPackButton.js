@@ -25,6 +25,7 @@ const styles = {
     fontWeight: "bold", 
     padding: "1%",
     fontSize: "18px",
+    userSelect: "none",
   }
 };
 

@@ -5,6 +5,7 @@ import VerticalStartIndicator from './VerticalStartIndicator';
 import HorizontalStartIndicator from './HorizontalStartIndicator';
 import WordPackList from './WordPackList.js';
 
+
 class App extends Component {
   constructor(props) {
     super(props);
