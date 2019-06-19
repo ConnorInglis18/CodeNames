@@ -4,40 +4,47 @@ import Board from './Board.js';
 import VerticalStartIndicator from './VerticalStartIndicator';
 import HorizontalStartIndicator from './HorizontalStartIndicator';
 import WordPackList from './WordPackList.js';
+import PropTypes from 'prop-types';
+import Chevron from './Chevron.js';
 
 
 class App extends Component {
+  static propTypes = {
+    url: PropTypes.string.isRequired,
+    webPacksPerPage: PropTypes.number.isRequired
+  }
+
   constructor(props) {
     super(props);
     this.state = {
       firstPlayer: '',
       toggleColors: true,
       words: [],
-      wordPacks: []
+      wordPacks: [],
+      pageNumber: 1,
+      totalPacks: 0
     }
-    this.toggleView = this.toggleView.bind(this);
-    this.handlePacks = this.handlePacks.bind(this);
-    //this.handleChange = this.handleChange.bind(this);
   }
 
   componentDidMount() {
     // Call REST API to get number of likes
-    fetch("http://127.0.0.1:5000/api/v1/")
+    fetch(this.props.url)
     .then((response) => {
         if (!response.ok) throw Error(response.statusText);
             return response.json();
         })
     .then((data) => {
         this.setState({
-            words: data.players,
+            words: data.words,
             firstPlayer: data.firstPlayer,
-            wordPacks: data.wordPacks
+            wordPacks: data.wordPacks,
+            totalPacks: data.totalPacks
         })
     })
     .catch(error => console.log(error)); // eslint-disable-line no-console 
   }
 
-  toggleView(event) {
+  toggleView = event => {
     event.preventDefault();
     this.setState({
       toggleColors: !this.state.toggleColors
@@ -50,10 +57,9 @@ class App extends Component {
   //   });
   // }
 
-  handlePacks(event) {
+  handlePacks = event => {
     event.preventDefault();
-    let url = "http://127.0.0.1:5000/api/v1/" + event.target.className;
-    console.log(url);
+    let url = this.props.url + event.target.className;
     fetch(url)
       .then((response) => {
         if (!response.ok) throw Error(response.statusText);
@@ -61,15 +67,22 @@ class App extends Component {
       })
       .then((data) => {
         this.setState({
-          words: data.players,
+          words: data.words,
           firstPlayer: data.firstPlayer,
         })
       })
       .catch(error => console.log(error)); // eslint-disable-line no-console 
   }
 
-  render () {
+  previousPage = event => {
+    this.setState({ pageNumber: this.state.pageNumber - 1 });
+  }
 
+  nextPage = event => {
+    this.setState({ pageNumber: this.state.pageNumber + 1 });
+  }
+
+  render () {
     return (
       <div style={styles.screen}>
         <div className="container">
@@ -81,7 +94,21 @@ class App extends Component {
             <HorizontalStartIndicator firstPlayer={this.state.firstPlayer} />
           </div>
           <div style={styles.bottomHalf}>
-            <WordPackList wordPacks={this.state.wordPacks} onClick={this.handlePacks}/>
+            <div style={styles.webPacks}>
+              <Chevron direction="left" 
+                onClick={this.previousPage} 
+                webPacksPerPage={this.props.webPacksPerPage} 
+                pageNumber={this.state.pageNumber} 
+                totalPacks={this.state.totalPacks}
+              />
+              <WordPackList wordPacks={this.state.wordPacks} onClick={this.handlePacks} webPacksPerPage={this.props.webPacksPerPage} pageNumber={this.state.pageNumber} />
+              <Chevron direction="right"
+                onClick={this.nextPage} 
+                webPacksPerPage={this.props.webPacksPerPage} 
+                pageNumber={this.state.pageNumber} 
+                totalPacks={this.state.totalPacks}
+              />
+            </div>
             <div style={styles.button} onClick={this.toggleView} className="toggle-view">
               <h1>Toggle Colors</h1>
             </div>
@@ -117,12 +144,26 @@ const styles = {
   button: {
     display: "flex",
     backgroundColor: "white",
-    width: "35%",
-    height: "60%",
+    width: "25%",
+    height: "50%",
     alignItems: "center",
     justifyContent: "center",
     boxShadow: "3px 3px",
     cursor: "pointer",
+    margin: "5%",
+    overflowWrap: "break-word",
+    userSelect: "none",
+    textAlign: "center",
+    padding: "2.5%",
+  },
+  webPacks: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "60%",
+    margin: "5%",
+    height: "40%"
   }
 };
 

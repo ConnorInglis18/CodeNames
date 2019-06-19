@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
+import '../Static/css/WordPackButton.css';
 
 class WordPackButton extends Component {
     render() {  
         let display_name = this.props.wordPack.replace(/_/g," ");
         return (
-            <div className={this.props.wordPack} onClick={this.props.onClick} style={styles.button}>
+            <div id="wordPackButton" className={this.props.wordPack} onClick={this.props.onClick} style={styles.button}>
                 {display_name}
             </div>
         )
@@ -15,8 +16,8 @@ const styles = {
   button: {
     display: "flex",
     backgroundColor: "white",
-    width: "18%",
-    height: "40%",
+    width: "25%",
+    height: "80%",
     alignItems: "center",
     justifyContent: "center",
     boxShadow: "3px 3px",
@@ -24,8 +25,8 @@ const styles = {
     margin: "1%",
     fontWeight: "bold", 
     padding: "1%",
-    fontSize: "18px",
     userSelect: "none",
+    textAlign: "center"
   }
 };
 

@@ -1,8 +1,10 @@
-from flask import Flask, jsonify, request, make_response
-from flask_cors import CORS
-import random
-import numpy as np
 import os
+import random
+
+import numpy as np
+from flask import Flask, jsonify, make_response, request
+from flask_cors import CORS
+
 #import requests
 
 app = Flask(__name__)
@@ -18,7 +20,7 @@ def randomColor():
         return {"first": "blue",
                 "second": "red"}
 
-def get25Players(firstPlayer, packName):
+def get25words(firstPlayer, packName):
     colorArray = []
 
     # add colors to color array
@@ -68,8 +70,10 @@ def generateSinglePlayerGame():
     context = {}
     firstPlayer = randomColor()
     context["firstPlayer"] = firstPlayer["first"]
-    context["players"] = get25Players(firstPlayer, 'Default')
-    context["wordPacks"] = getWordPacks()
+    context["words"] = get25words(firstPlayer, 'Default')
+    packs = getWordPacks()
+    context["wordPacks"] = packs
+    context["totalPacks"] = len(packs)
     return jsonify(**context)
 
 
@@ -80,11 +84,12 @@ def generateMultiplayerGame(packName):
         make_response(jsonify(**context), 201)
     else:
         firstPlayer = randomColor()
-        players = get25Players(firstPlayer, packName)
         context = {}
         context["firstPlayer"] = firstPlayer["first"]
-        context["players"] = players
-        context["wordPacks"] = getWordPacks()
+        context["words"] = get25words(firstPlayer, packName)
+        packs = getWordPacks()
+        context["wordPacks"] = packs
+        context["totalPacks"] = len(packs)
         return jsonify(**context)
 
 # @app.route("/api/v1/users", methods=["GET"])

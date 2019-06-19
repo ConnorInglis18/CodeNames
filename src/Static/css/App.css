@@ -39,7 +39,7 @@
 }
 
 .toggle-view {
-  font-size: 2.0vw;
+  font-size: 1.8vw;
 }
 
 li {
@@ -64,7 +64,7 @@ li {
     background-color: lightgrey;
   }
   .toggle-view {
-    font-size: 20px;
+    font-size: 18px;
   }
   li {
     font-size: 15px;

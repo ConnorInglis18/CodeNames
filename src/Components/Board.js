@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Card from './Card.js';
 
 class Board extends Component {
+    static propTypes = {
+        toggleColors: PropTypes.bool.isRequired,
+        words: PropTypes.array.isRequired
+    }
+    
     render() {
         let players = this.props.words.map((data,index) => 
             <Card key={index} word={data[0]} displayColor={data[1]} cardColor={data[1]} />

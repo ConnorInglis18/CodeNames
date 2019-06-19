@@ -1,0 +1,9 @@
+#wordPackButton {
+  font-size: 1.6vw;
+}
+
+@media (min-width: 1000px) {
+  #wordPackButton {
+      font-size: 16px;
+  }
+}

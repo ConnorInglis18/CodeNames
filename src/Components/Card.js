@@ -1,7 +1,14 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import '../Static/css/Card.css';
 
 class Card extends Component {
+    static propTypes = {
+        word: PropTypes.string.isRequired,
+        displayColor: PropTypes.string.isRequired,
+        cardColor: PropTypes.string.isRequired,
+      }
+
     constructor(props) {
         super(props);
         this.state = {
@@ -88,6 +95,7 @@ const styles = {
         cursor: "pointer",
         padding: "3%",
         userSelect: "none",
+        overflowWrap: "break-word",
     },
     tanColor: {
         backgroundColor: "tan",
