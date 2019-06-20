@@ -7,6 +7,8 @@ class Card extends Component {
         word: PropTypes.string.isRequired,
         displayColor: PropTypes.string.isRequired,
         cardColor: PropTypes.string.isRequired,
+        socket: PropTypes.object.isRequired,
+        id: PropTypes.number.isRequired,
       }
 
     constructor(props) {
@@ -18,6 +20,7 @@ class Card extends Component {
     }
 
     handleClick(event) {
+        this.props.socket.emit('click', event.target.id);
         this.setState({
             beenClicked: !this.state.beenClicked
         });
@@ -27,54 +30,54 @@ class Card extends Component {
         return(
             (this.state.beenClicked === true && this.props.cardColor === "tan")
             ?
-            <div onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.handleClick} className="card"
             style={Object.assign({}, styles.card, styles.clickedTanColor)}>
                 {this.props.word}
             </div>
             :
             (this.state.beenClicked === true && this.props.cardColor === "blue")
             ?
-            <div onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.handleClick} className="card"
             style={Object.assign({}, styles.card, styles.clickedBlueColor)}>
                 {this.props.word}
             </div>
             :
             (this.state.beenClicked === true && this.props.cardColor === "red")
             ?
-            <div onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.handleClick} className="card"
             style={Object.assign({}, styles.card, styles.clickedRedColor)}>
                 {this.props.word}
             </div>
             :
             (this.state.beenClicked === true && this.props.cardColor === "black")
             ?
-            <div onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.handleClick} className="card"
             style={Object.assign({}, styles.card, styles.clickedBlackColor)}>
                 {this.props.word}
             </div>
             :
             this.props.displayColor === "tan"
             ?
-            <div onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.handleClick} className="card"
             style={Object.assign({}, styles.card, styles.tanColor)}>
                 {this.props.word}
             </div>
             :
             this.props.displayColor === "blue"
             ?
-            <div onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.handleClick} className="card"
             style={Object.assign({}, styles.card, styles.blueColor)}>
                 {this.props.word}
             </div>
             :
             this.props.displayColor === "red"
             ?
-            <div onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.handleClick} className="card"
             style={Object.assign({}, styles.card, styles.redColor)}>
                 {this.props.word}
             </div>
             :
-            <div onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.handleClick} className="card"
             style={Object.assign({}, styles.card, styles.blackColor)}>
                 {this.props.word}
             </div>

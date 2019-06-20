@@ -5,15 +5,16 @@ import Card from './Card.js';
 class Board extends Component {
     static propTypes = {
         toggleColors: PropTypes.bool.isRequired,
-        words: PropTypes.array.isRequired
+        words: PropTypes.array.isRequired,
+        socket: PropTypes.object.isRequired
     }
 
     render() {
         let players = this.props.words.map((data,index) => 
-            <Card key={index} word={data[0]} displayColor={data[1]} cardColor={data[1]} />
+            <Card key={index} id={index} word={data[0]} displayColor={data[1]} cardColor={data[1]} socket={this.props.socket} />
         )
         let defaultCards = this.props.words.map((data,index) =>
-            <Card key={index} word={data[0]} displayColor={"tan"} cardColor={data[1]} />
+            <Card key={index} id={index} word={data[0]} displayColor={"tan"} cardColor={data[1]} socket={this.props.socket}/>
         )
         return (
             <React.Fragment>

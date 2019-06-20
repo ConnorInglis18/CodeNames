@@ -6,8 +6,9 @@ import HorizontalStartIndicator from './HorizontalStartIndicator';
 import WordPackList from './WordPackList.js';
 import PropTypes from 'prop-types';
 import Chevron from './Chevron.js';
+import openSocket from 'socket.io-client';
 
-
+// const socketUrl = "localhost:3231"
 class App extends Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
@@ -17,13 +18,42 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      socket: openSocket('http://localhost:3231'),
       firstPlayer: '',
       toggleColors: true,
       words: [],
       wordPacks: [],
       pageNumber: 1,
-      totalPacks: 0
+      totalPacks: 0,
+      role: ''
     }
+
+    let self = this
+    this.state.socket.on('board', board => {
+      console.log("BOARD: " + board);
+      //this.setState(...self.state, {board: board})
+    });
+    this.state.socket.on('turn', color => {
+      console.log("COLOR: " + color);
+      //this.setState(...self.state, {color: color})
+    });
+    this.state.socket.on('assignRole', player => {
+      this.setState({role: player});
+      console.log("Role: " + player);
+      if (player === "redGuesser" || player === "blueGuesser") {
+        this.setState({toggleColors:false});
+      } else if (player === "blueGuesser") {
+        console.log("Role: " + player);
+      } else if (player === "blueGiver") {
+        console.log("Role: " + player);
+      } else {
+        console.log("Role: " + player);
+      }
+    });
+    this.state.socket.on('tileClicked', tileId => {
+      console.log("TileID: " + tileId);
+    })
+
   }
 
   componentDidMount() {
@@ -44,6 +74,31 @@ class App extends Component {
     .catch(error => console.log(error)); // eslint-disable-line no-console 
   }
 
+  // componentWillMount() {
+  //   this.initSocket();
+  // }
+
+  // initSocket = () => {
+  //   const socket = io(socketUrl);
+  //   socket.on('connect', () =>{
+  //     console.log("Connected from initSocket");
+  //   })
+  //   this.setState({socket});
+  // }
+
+  // setUser = (user)=>{
+  //   const { socket } = this.state;
+  //   socket.emit(USER_CONNECTED, user);
+  //   this.setState({user})
+  // }
+
+  // logout = () => {
+  //   const { socket } = this.state;
+  //   socket.emit(LOGOUT);
+  //   this.setState({ user:null });
+  // }
+
+
   toggleView = event => {
     event.preventDefault();
     this.setState({
@@ -60,6 +115,7 @@ class App extends Component {
   handlePacks = event => {
     event.preventDefault();
     let url = this.props.url + event.target.className;
+    this.state.socket.emit('click', 4);
     fetch(url)
       .then((response) => {
         if (!response.ok) throw Error(response.statusText);
@@ -89,7 +145,7 @@ class App extends Component {
           <div style={styles.topHalf}>
             <HorizontalStartIndicator firstPlayer={this.state.firstPlayer} />
             <VerticalStartIndicator firstPlayer={this.state.firstPlayer}/>
-            <Board toggleColors={this.state.toggleColors} words={this.state.words} />
+            <Board toggleColors={this.state.toggleColors} words={this.state.words} socket={this.state.socket} />
             <VerticalStartIndicator firstPlayer={this.state.firstPlayer}/>
             <HorizontalStartIndicator firstPlayer={this.state.firstPlayer} />
           </div>
@@ -110,7 +166,7 @@ class App extends Component {
               />
             </div>
             <div style={styles.button} onClick={this.toggleView} className="toggle-view">
-              <h1>Toggle Colors</h1>
+              <h1>{this.state.role}</h1>
             </div>
           </div>
         </div>
