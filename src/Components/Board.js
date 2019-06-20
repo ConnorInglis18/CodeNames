@@ -7,7 +7,7 @@ class Board extends Component {
         toggleColors: PropTypes.bool.isRequired,
         words: PropTypes.array.isRequired
     }
-    
+
     render() {
         let players = this.props.words.map((data,index) => 
             <Card key={index} word={data[0]} displayColor={data[1]} cardColor={data[1]} />
