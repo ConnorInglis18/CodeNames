@@ -25,7 +25,8 @@ class App extends Component {
       wordPacks: [],
       pageNumber: 1,
       totalPacks: 0,
-      role: ''
+      role: '',
+
     }
 
     //let self = this
@@ -50,7 +51,6 @@ class App extends Component {
           cards: cardsCopy
       });
     })
-
   }
 
   componentDidMount() {
@@ -65,7 +65,8 @@ class App extends Component {
             cards: data.cards,
             firstPlayer: data.firstPlayer,
             wordPacks: data.wordPacks,
-            totalPacks: data.totalPacks
+            totalPacks: data.totalPacks,
+            gameId: ''
         })
     })
     .catch(error => console.log(error)); // eslint-disable-line no-console 

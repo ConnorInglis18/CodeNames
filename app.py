@@ -10,6 +10,169 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+games = {}
+games["321"] = {
+                "cards": [
+                    {
+                    "beenClicked": "false",
+                    "color": "tan",
+                    "id": 0,
+                    "word": "nurse"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "red",
+                    "id": 1,
+                    "word": "moscow"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "red",
+                    "id": 2,
+                    "word": "maple"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "blue",
+                    "id": 3,
+                    "word": "olive"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "red",
+                    "id": 4,
+                    "word": "wall"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "tan",
+                    "id": 5,
+                    "word": "ghost"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "tan",
+                    "id": 6,
+                    "word": "van"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "tan",
+                    "id": 7,
+                    "word": "cross"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "blue",
+                    "id": 8,
+                    "word": "server"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "tan",
+                    "id": 9,
+                    "word": "fall"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "blue",
+                    "id": 10,
+                    "word": "gold"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "blue",
+                    "id": 11,
+                    "word": "turkey"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "tan",
+                    "id": 12,
+                    "word": "box"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "tan",
+                    "id": 13,
+                    "word": "war"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "red",
+                    "id": 14,
+                    "word": "eagle"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "red",
+                    "id": 15,
+                    "word": "dwarf"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "blue",
+                    "id": 16,
+                    "word": "rome"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "blue",
+                    "id": 17,
+                    "word": "knife"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "red",
+                    "id": 18,
+                    "word": "angel"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "red",
+                    "id": 19,
+                    "word": "giant"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "black",
+                    "id": 20,
+                    "word": "chocolate"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "red",
+                    "id": 21,
+                    "word": "forest"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "blue",
+                    "id": 22,
+                    "word": "mammoth"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "blue",
+                    "id": 23,
+                    "word": "circle"
+                    },
+                    {
+                    "beenClicked": "false",
+                    "color": "red",
+                    "id": 24,
+                    "word": "rock"
+                    }
+                ],
+                "firstPlayer": "red",
+                "totalPacks": 4,
+                "wordPacks": [
+                    "Sports_Teams",
+                    "Default",
+                    "NSFW",
+                    "Premier_League"
+                ]
+}
 
 def randomColor():
     num = random.randint(0,2)
@@ -95,6 +258,10 @@ def generateMultiplayerGame(packName):
         context["wordPacks"] = packs
         context["totalPacks"] = len(packs)
         return jsonify(**context)
+
+@app.route("/api/v1/game/<string:gameNumber>", methods=["GET", "POST"])
+def getSpecificGame(gameNumber):
+    return jsonify(**games[gameNumber])
 
 # @app.route("/api/v1/users", methods=["GET"])
 # def users():
