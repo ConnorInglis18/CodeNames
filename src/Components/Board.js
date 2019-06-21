@@ -5,24 +5,44 @@ import Card from './Card.js';
 class Board extends Component {
     static propTypes = {
         toggleColors: PropTypes.bool.isRequired,
-        words: PropTypes.array.isRequired,
-        socket: PropTypes.object.isRequired
+        cards: PropTypes.array.isRequired,
+        socket: PropTypes.object.isRequired,
+        handleCardClick: PropTypes.func.isRequired
     }
 
     render() {
-        let players = this.props.words.map((data,index) => 
-            <Card key={index} id={index} word={data[0]} displayColor={data[1]} cardColor={data[1]} socket={this.props.socket} />
+
+        let coloredCards = this.props.cards.map((data,index) => 
+            <Card 
+                key={index}
+                id={index}
+                word={data["word"]}
+                displayColor={data["color"]}
+                cardColor={data["color"]}
+                socket={this.props.socket}
+                beenClicked={data["beenClicked"]}
+                handleCardClick={this.props.handleCardClick}
+            />
         )
-        let defaultCards = this.props.words.map((data,index) =>
-            <Card key={index} id={index} word={data[0]} displayColor={"tan"} cardColor={data[1]} socket={this.props.socket}/>
+        let defaultCards = this.props.cards.map((data,index) =>
+            <Card
+                key={index}
+                id={index}
+                word={data["word"]}
+                displayColor={"tan"}
+                cardColor={data["color"]}
+                socket={this.props.socket}
+                beenClicked={data["beenClicked"]}
+                handleCardClick={this.props.handleCardClick}
+            />
         )
         return (
             <React.Fragment>
                 {this.props.toggleColors === true
                 ?
-                <div style={styles.cards}>{players}</div>
+                <div style={styles.card}>{coloredCards}</div>
                 :
-                <div style={styles.cards}>{defaultCards}</div>
+                <div style={styles.card}>{defaultCards}</div>
                 }
             </React.Fragment>
         )
@@ -30,7 +50,7 @@ class Board extends Component {
 }
 
 const styles = {
-    cards: {
+    card: {
         display: "flex",
         flexFlow: "row wrap",
         justifyContent: "space-around",

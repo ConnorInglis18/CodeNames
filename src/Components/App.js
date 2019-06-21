@@ -21,14 +21,14 @@ class App extends Component {
       socket: openSocket('http://localhost:3231'),
       firstPlayer: '',
       toggleColors: true,
-      words: [],
+      cards: [],
       wordPacks: [],
       pageNumber: 1,
       totalPacks: 0,
       role: ''
     }
 
-    let self = this
+    //let self = this
     this.state.socket.on('board', board => {
       console.log("BOARD: " + board);
       //this.setState(...self.state, {board: board})
@@ -39,19 +39,16 @@ class App extends Component {
     });
     this.state.socket.on('assignRole', player => {
       this.setState({role: player});
-      console.log("Role: " + player);
       if (player === "redGuesser" || player === "blueGuesser") {
         this.setState({toggleColors:false});
-      } else if (player === "blueGuesser") {
-        console.log("Role: " + player);
-      } else if (player === "blueGiver") {
-        console.log("Role: " + player);
-      } else {
-        console.log("Role: " + player);
       }
     });
     this.state.socket.on('tileClicked', tileId => {
-      console.log("TileID: " + tileId);
+      const cardsCopy = Object.assign([], this.state.cards);
+      cardsCopy[tileId]["beenClicked"] = cardsCopy[tileId]["beenClicked"] === "true" ? "false" : "true"
+      this.setState({
+          cards: cardsCopy
+      });
     })
 
   }
@@ -65,7 +62,7 @@ class App extends Component {
         })
     .then((data) => {
         this.setState({
-            words: data.words,
+            cards: data.cards,
             firstPlayer: data.firstPlayer,
             wordPacks: data.wordPacks,
             totalPacks: data.totalPacks
@@ -74,43 +71,12 @@ class App extends Component {
     .catch(error => console.log(error)); // eslint-disable-line no-console 
   }
 
-  // componentWillMount() {
-  //   this.initSocket();
-  // }
-
-  // initSocket = () => {
-  //   const socket = io(socketUrl);
-  //   socket.on('connect', () =>{
-  //     console.log("Connected from initSocket");
-  //   })
-  //   this.setState({socket});
-  // }
-
-  // setUser = (user)=>{
-  //   const { socket } = this.state;
-  //   socket.emit(USER_CONNECTED, user);
-  //   this.setState({user})
-  // }
-
-  // logout = () => {
-  //   const { socket } = this.state;
-  //   socket.emit(LOGOUT);
-  //   this.setState({ user:null });
-  // }
-
-
   toggleView = event => {
     event.preventDefault();
     this.setState({
       toggleColors: !this.state.toggleColors
     });
   }
-  
-  // handleChange(event) {
-  //   this.setState({
-  //     inputValue: event.target.value
-  //   });
-  // }
 
   handlePacks = event => {
     event.preventDefault();
@@ -123,7 +89,7 @@ class App extends Component {
       })
       .then((data) => {
         this.setState({
-          words: data.words,
+          cards: data.cards,
           firstPlayer: data.firstPlayer,
         })
       })
@@ -138,6 +104,10 @@ class App extends Component {
     this.setState({ pageNumber: this.state.pageNumber + 1 });
   }
 
+  handleCardClick = event => {
+    this.state.socket.emit('click', event.target.id);
+  }
+
   render () {
     return (
       <div style={styles.screen}>
@@ -145,7 +115,7 @@ class App extends Component {
           <div style={styles.topHalf}>
             <HorizontalStartIndicator firstPlayer={this.state.firstPlayer} />
             <VerticalStartIndicator firstPlayer={this.state.firstPlayer}/>
-            <Board toggleColors={this.state.toggleColors} words={this.state.words} socket={this.state.socket} />
+            <Board toggleColors={this.state.toggleColors} cards={this.state.cards} socket={this.state.socket} handleCardClick={this.handleCardClick}/>
             <VerticalStartIndicator firstPlayer={this.state.firstPlayer}/>
             <HorizontalStartIndicator firstPlayer={this.state.firstPlayer} />
           </div>

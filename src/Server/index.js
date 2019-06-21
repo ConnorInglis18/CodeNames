@@ -40,7 +40,7 @@ io.on('connection', function(socket) {
   } else if (players["blueGuesser"] == null) {
     players["blueGuesser"] = socket;
     socket.emit("assignRole", "blueGuesser");
-    io.emit("turn", "LETS GO EVERYONE!");
+    //io.emit("turn", "LETS GO EVERYONE!");
   } else {
     socket.disconnect();
   }
@@ -61,7 +61,6 @@ io.on('connection', function(socket) {
 
 
   socket.on("click", function(tileId) {
-    console.log("TileId: " + tileId);
     io.emit("tileClicked", tileId);
   })
 

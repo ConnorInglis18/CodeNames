@@ -9,75 +9,63 @@ class Card extends Component {
         cardColor: PropTypes.string.isRequired,
         socket: PropTypes.object.isRequired,
         id: PropTypes.number.isRequired,
-      }
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            beenClicked: this.props.beenClicked
-        }
-        this.handleClick = this.handleClick.bind(this);
+        beenClicked: PropTypes.string.isRequired,
+        handleCardClick: PropTypes.func.isRequired
     }
-
-    handleClick(event) {
-        this.props.socket.emit('click', event.target.id);
-        this.setState({
-            beenClicked: !this.state.beenClicked
-        });
-    }
-
+    
     render() {
+        const beenClicked = this.props.beenClicked === "true"
         return(
-            (this.state.beenClicked === true && this.props.cardColor === "tan")
+            (beenClicked === true && this.props.cardColor === "tan")
             ?
-            <div id={this.props.id} onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.props.handleCardClick} className="card"
             style={Object.assign({}, styles.card, styles.clickedTanColor)}>
                 {this.props.word}
             </div>
             :
-            (this.state.beenClicked === true && this.props.cardColor === "blue")
+            (beenClicked === true && this.props.cardColor === "blue")
             ?
-            <div id={this.props.id} onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.props.handleCardClick} className="card"
             style={Object.assign({}, styles.card, styles.clickedBlueColor)}>
                 {this.props.word}
             </div>
             :
-            (this.state.beenClicked === true && this.props.cardColor === "red")
+            (beenClicked === true && this.props.cardColor === "red")
             ?
-            <div id={this.props.id} onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.props.handleCardClick} className="card"
             style={Object.assign({}, styles.card, styles.clickedRedColor)}>
                 {this.props.word}
             </div>
             :
-            (this.state.beenClicked === true && this.props.cardColor === "black")
+            (beenClicked === true && this.props.cardColor === "black")
             ?
-            <div id={this.props.id} onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.props.handleCardClick} className="card"
             style={Object.assign({}, styles.card, styles.clickedBlackColor)}>
                 {this.props.word}
             </div>
             :
             this.props.displayColor === "tan"
             ?
-            <div id={this.props.id} onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.props.handleCardClick} className="card"
             style={Object.assign({}, styles.card, styles.tanColor)}>
                 {this.props.word}
             </div>
             :
             this.props.displayColor === "blue"
             ?
-            <div id={this.props.id} onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.props.handleCardClick} className="card"
             style={Object.assign({}, styles.card, styles.blueColor)}>
                 {this.props.word}
             </div>
             :
             this.props.displayColor === "red"
             ?
-            <div id={this.props.id} onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.props.handleCardClick} className="card"
             style={Object.assign({}, styles.card, styles.redColor)}>
                 {this.props.word}
             </div>
             :
-            <div id={this.props.id} onClick={this.handleClick} className="card"
+            <div id={this.props.id} onClick={this.props.handleCardClick} className="card"
             style={Object.assign({}, styles.card, styles.blackColor)}>
                 {this.props.word}
             </div>

@@ -50,7 +50,11 @@ def get25words(firstPlayer, packName):
     wordsSet = list(wordsSet)
     returnedElements = []
     for i in range(0,len(wordsSet)):
-        returnedElements.append([wordsSet[i].strip(),colorArray[i]])
+        returnedElements.append({
+            "word": wordsSet[i].strip(),
+            "color": colorArray[i],
+            "beenClicked": "false"
+        })
 
     return returnedElements
 
@@ -70,7 +74,7 @@ def generateSinglePlayerGame():
     context = {}
     firstPlayer = randomColor()
     context["firstPlayer"] = firstPlayer["first"]
-    context["words"] = get25words(firstPlayer, 'Default')
+    context["cards"] = get25words(firstPlayer, 'Default')
     packs = getWordPacks()
     context["wordPacks"] = packs
     context["totalPacks"] = len(packs)
@@ -86,7 +90,7 @@ def generateMultiplayerGame(packName):
         firstPlayer = randomColor()
         context = {}
         context["firstPlayer"] = firstPlayer["first"]
-        context["words"] = get25words(firstPlayer, packName)
+        context["cards"] = get25words(firstPlayer, packName)
         packs = getWordPacks()
         context["wordPacks"] = packs
         context["totalPacks"] = len(packs)
