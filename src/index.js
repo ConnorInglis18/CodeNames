@@ -4,9 +4,10 @@ import './Static/css/index.css';
 import App from './Components/App.js';
 import * as serviceWorker from './serviceWorker';
 
-const devUrl = "http://localhost:5000/api/v1/game/321"
-const prodUrl = "https://testing-deployment-01.herokuapp.com/api/v1/"
-ReactDOM.render(<App url={devUrl} webPacksPerPage={3} />, document.getElementById('root'));
+const devUrl = "http://localhost:5000/api/v1/"
+//const prodUrl = "https://testing-deployment-01.herokuapp.com/api/v1/"
+const socketUrl = "http://localhost:3231"
+ReactDOM.render(<App url={devUrl} socketUrl={socketUrl} webPacksPerPage={3} />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

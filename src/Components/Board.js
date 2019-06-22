@@ -7,7 +7,7 @@ class Board extends Component {
         toggleColors: PropTypes.bool.isRequired,
         cards: PropTypes.array.isRequired,
         socket: PropTypes.object.isRequired,
-        handleCardClick: PropTypes.func.isRequired
+        handleCardClick: PropTypes.func.isRequired,
     }
 
     render() {

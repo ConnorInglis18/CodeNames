@@ -12,13 +12,14 @@ import openSocket from 'socket.io-client';
 class App extends Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
+    socketUrl: PropTypes.string.isRequired,
     webPacksPerPage: PropTypes.number.isRequired
   }
 
   constructor(props) {
     super(props);
     this.state = {
-      socket: openSocket('http://localhost:3231'),
+      socket: openSocket(this.props.socketUrl),
       firstPlayer: '',
       toggleColors: true,
       cards: [],
@@ -26,36 +27,44 @@ class App extends Component {
       pageNumber: 1,
       totalPacks: 0,
       role: '',
-
+      gameId: ''
     }
 
-    //let self = this
-    this.state.socket.on('board', board => {
-      console.log("BOARD: " + board);
-      //this.setState(...self.state, {board: board})
+    this.state.socket.on('gameId', gameId => {
+      this.setState({gameId: gameId});
+      console.log("GameID: " + gameId);
+      this.getBoard(gameId);
     });
-    this.state.socket.on('turn', color => {
-      console.log("COLOR: " + color);
-      //this.setState(...self.state, {color: color})
-    });
+
     this.state.socket.on('assignRole', player => {
       this.setState({role: player});
       if (player === "redGuesser" || player === "blueGuesser") {
         this.setState({toggleColors:false});
       }
     });
+
     this.state.socket.on('tileClicked', tileId => {
       const cardsCopy = Object.assign([], this.state.cards);
       cardsCopy[tileId]["beenClicked"] = cardsCopy[tileId]["beenClicked"] === "true" ? "false" : "true"
       this.setState({
           cards: cardsCopy
       });
-    })
+    });
+
+    this.state.socket.on('deleteAllGames', () => {
+      this.deleteAllGames()
+    });
   }
 
-  componentDidMount() {
+  componentWillUnmount() {
+    this.deleteAllGames();
+  }
+
+  getBoard = (gameId) => {
     // Call REST API to get number of likes
-    fetch(this.props.url)
+    let url = this.props.url + "createGame/" + gameId;
+    console.log(url)
+    fetch(url)
     .then((response) => {
         if (!response.ok) throw Error(response.statusText);
             return response.json();
@@ -69,6 +78,17 @@ class App extends Component {
             gameId: ''
         })
     })
+    .catch(error => console.log(error)); // eslint-disable-line no-console 
+  }
+
+  deleteAllGames = () => {
+    let url = this.props.url + "deleteAllGames/";
+    fetch(url)
+    .then((response) => {
+      if (!response.ok) throw Error(response.statusText);
+        return response.json();
+      })
+    .then((data) => {})
     .catch(error => console.log(error)); // eslint-disable-line no-console 
   }
 
@@ -113,6 +133,16 @@ class App extends Component {
     return (
       <div style={styles.screen}>
         <div className="container">
+          {/* {this.state.numPlayers < 4
+          ?
+          <CreateGame />
+          :
+          <PlayGame 
+            firstPlayer={this.state.firstPlayer}
+            
+          /> */}
+
+          }
           <div style={styles.topHalf}>
             <HorizontalStartIndicator firstPlayer={this.state.firstPlayer} />
             <VerticalStartIndicator firstPlayer={this.state.firstPlayer}/>
@@ -136,8 +166,11 @@ class App extends Component {
                 totalPacks={this.state.totalPacks}
               />
             </div>
-            <div style={styles.button} onClick={this.toggleView} className="toggle-view">
-              <h1>{this.state.role}</h1>
+            <div style={styles.button}>
+              <div onClick={this.toggleView} className="toggle-view">{this.state.role}</div>
+              <div onClick={this.DeletGames}>Delete Games</div>
+              <div>{this.state.role}</div>
+              <div>{this.state.role}</div>
             </div>
           </div>
         </div>

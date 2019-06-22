@@ -10,8 +10,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-games = {}
-games["321"] = {
+GAMES = {}
+GAMES[321] = {
                 "cards": [
                     {
                     "beenClicked": "false",
@@ -230,17 +230,21 @@ def getWordPacks():
             if '.txt' in file:
                 files.append(file.split(".")[0])
     return files
+
+def makeGame(packName):
+    context = {}
+    firstPlayer = randomColor()
+    context["firstPlayer"] = firstPlayer["first"]
+    context["cards"] = get25words(firstPlayer, packName)
+    packs = getWordPacks()
+    context["wordPacks"] = packs
+    context["totalPacks"] = len(packs)
+    return context
     
 
 @app.route("/api/v1/", methods=["GET"])
 def generateSinglePlayerGame():
-    context = {}
-    firstPlayer = randomColor()
-    context["firstPlayer"] = firstPlayer["first"]
-    context["cards"] = get25words(firstPlayer, 'Default')
-    packs = getWordPacks()
-    context["wordPacks"] = packs
-    context["totalPacks"] = len(packs)
+    context = makeGame("Default")
     return jsonify(**context)
 
 
@@ -259,9 +263,27 @@ def generateMultiplayerGame(packName):
         context["totalPacks"] = len(packs)
         return jsonify(**context)
 
-@app.route("/api/v1/game/<string:gameNumber>", methods=["GET", "POST"])
-def getSpecificGame(gameNumber):
-    return jsonify(**games[gameNumber])
+@app.route("/api/v1/createGame/<int:gameId>/<string:packName>", methods=["GET", "POST"])
+def getPackGame(gameId, packName):
+    if gameId in GAMES:
+        return jsonify(**GAMES[gameId])
+    context = makeGame(packName)
+    GAMES[gameId] = context
+    return jsonify(**context)
+
+@app.route("/api/v1/createGame/<int:gameId>/", methods=["GET", "POST"])
+def getDefaultGame(gameId):
+    if gameId in GAMES:
+        return jsonify(**GAMES[gameId])
+    context = makeGame("Default")
+    GAMES[gameId] = context
+    return jsonify(**context)
+
+@app.route("/api/v1/deleteAllGames/", methods=["GET", "POST"])
+def deleteAllGames():
+    print(GAMES)
+    GAMES.clear()
+    print(GAMES)
 
 # @app.route("/api/v1/users", methods=["GET"])
 # def users():
