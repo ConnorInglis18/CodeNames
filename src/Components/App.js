@@ -8,7 +8,6 @@ import WaitingPanel from './WaitingPanel.js';
 import RolePanel from './RolePanel.js';
 import PackPanel from './PackPanel.js';
 
-// const socketUrl = "localhost:3231"
 class App extends Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
