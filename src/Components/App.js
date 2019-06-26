@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import './../Static/css/App.css';
-import Board from './Board.js';
-import VerticalStartIndicator from './VerticalStartIndicator';
-import HorizontalStartIndicator from './HorizontalStartIndicator';
-import WordPackList from './WordPackList.js';
+import Game from './Game.js';
 import PropTypes from 'prop-types';
-import Chevron from './Chevron.js';
 import openSocket from 'socket.io-client';
+import RegisterUserPanel from './RegisterUserPanel.js';
+import WaitingPanel from './WaitingPanel.js';
+import RolePanel from './RolePanel.js';
+import PackPanel from './PackPanel.js';
 
 // const socketUrl = "localhost:3231"
 class App extends Component {
@@ -19,31 +19,75 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      socket: openSocket(this.props.socketUrl),
-      firstPlayer: '',
-      toggleColors: true,
       cards: [],
-      wordPacks: [],
+      clueWords: [],
+      clueWordValue: '',
+      firstColor: '',
+      gameId: '',
+      isFirstPlayer: false,
+      lobbyNames: [],
+      numRegisteredPlayers: 0,
+      packType: '',
       pageNumber: 1,
-      totalPacks: 0,
+      playerName: '',
+      playerRegistered: false,
       role: '',
-      gameId: ''
+      rolesChosen: [],
+      socket: openSocket(this.props.socketUrl),
+      toggleColors: true,
+      totalPacks: 0,
+      wordPacks: []
     }
 
-    this.state.socket.on('gameId', gameId => {
-      this.setState({gameId: gameId});
-      console.log("GameID: " + gameId);
-      this.getBoard(gameId);
+    this.state.socket.on('gameId', gameID => {
+      this.setState({ gameId: gameID }, () => {
+        console.log("GameID: " + this.state.gameId);
+      });
     });
 
-    this.state.socket.on('assignRole', player => {
-      this.setState({role: player});
-      if (player === "redGuesser" || player === "blueGuesser") {
-        this.setState({toggleColors:false});
-      }
+    this.state.socket.on("firstPlayer", _isFirstPlayer => {
+      this.setState({isFirstPlayer: _isFirstPlayer});
+      this.getPacks();
     });
 
-    this.state.socket.on('tileClicked', tileId => {
+    this.state.socket.on("message", message => {
+      console.log("MESSAGE: " + message);
+    });
+
+    this.state.socket.on("playerCount", info => {
+      this.setState({
+        numRegisteredPlayers: info["numPlayers"],
+        lobbyNames: info["lobbyList"]
+      });
+    });
+
+    this.state.socket.on("registerPlayer", name => {
+      this.setState({
+        playerName: name,
+        playerRegistered: true
+      });
+    });
+
+    this.state.socket.on("registerUserRole", playerRole => {
+      this.setState({role:playerRole}, () => {console.log("PLAYER ROLE: " + this.state.role);});
+    });
+
+    this.state.socket.on("registerNewRoll", roles => {
+      this.setState({rolesChosen: roles}, () => {
+        console.log("ROLES CHOSEN: " + this.state.rolesChosen);
+      })
+    })
+
+    this.state.socket.on("createGameBoard", content => {
+      this.setState({packType: content["pack"]});
+      this.getBoard(content["url"]);
+    })
+
+    this.state.socket.on("removePlayer", numPlayers => {
+      this.setState({numRegisteredPlayers: numPlayers});
+    });
+
+    this.state.socket.on('cardClicked', tileId => {
       const cardsCopy = Object.assign([], this.state.cards);
       cardsCopy[tileId]["beenClicked"] = cardsCopy[tileId]["beenClicked"] === "true" ? "false" : "true"
       this.setState({
@@ -51,8 +95,18 @@ class App extends Component {
       });
     });
 
+    this.state.socket.on("clueWordGiven", clueWordValue => {
+      let clueWordsCopy = Object.assign([],this.state.clueWords);
+      clueWordsCopy.push(clueWordValue);
+      this.setState({clueWords: clueWordsCopy, clueWordValue: ""});
+    })
+
     this.state.socket.on('deleteAllGames', () => {
       this.deleteAllGames()
+    });
+
+    this.state.socket.on("tooManyPlayers", () => {
+      console.log("Cannot Join Game due to too many players");
     });
   }
 
@@ -60,23 +114,38 @@ class App extends Component {
     this.deleteAllGames();
   }
 
-  getBoard = (gameId) => {
-    // Call REST API to get number of likes
-    let url = this.props.url + "createGame/" + gameId;
+  getPacks = () => {
+    let url = this.props.url + "wordPacks";
     console.log(url)
     fetch(url)
     .then((response) => {
-        if (!response.ok) throw Error(response.statusText);
-            return response.json();
-        })
+      console.log(response);
+      if (!response.ok) throw Error(response.statusText);
+          return response.json();
+      })
     .then((data) => {
-        this.setState({
-            cards: data.cards,
-            firstPlayer: data.firstPlayer,
-            wordPacks: data.wordPacks,
-            totalPacks: data.totalPacks,
-            gameId: ''
-        })
+      this.setState({
+        wordPacks: data.wordPacks,
+        totalPacks: data.totalPacks,
+      });
+    })
+    .catch(error => console.log(error)); // eslint-disable-line no-console 
+  }
+
+  getBoard = url => {
+    // Call REST API to get number of likes
+    console.log("URL FROM GetBoard: " + url);
+    fetch(url)
+    .then((response) => {
+      if (!response.ok) throw Error(response.statusText);
+          return response.json();
+      })
+    .then((data) => {
+      this.setState({
+        cards: data.cards,
+        firstColor: data.firstColor,
+        gameId: data.gameId
+      })
     })
     .catch(error => console.log(error)); // eslint-disable-line no-console 
   }
@@ -99,80 +168,119 @@ class App extends Component {
     });
   }
 
-  handlePacks = event => {
+  handlePackSelection = event => {
     event.preventDefault();
-    let url = this.props.url + event.target.className;
-    this.state.socket.emit('click', 4);
-    fetch(url)
-      .then((response) => {
-        if (!response.ok) throw Error(response.statusText);
-        return response.json();
-      })
-      .then((data) => {
-        this.setState({
-          cards: data.cards,
-          firstPlayer: data.firstPlayer,
-        })
-      })
-      .catch(error => console.log(error)); // eslint-disable-line no-console 
+    let pack = event.target.className;
+    let url = this.props.url + "createGame/" + this.state.gameId + "/" + pack;
+    let context = {"url":url,"packType":pack};
+    this.state.socket.emit("createGameBoard", context);
   }
 
-  previousPage = event => {
+  handleRoleSelection = event => {
+    event.preventDefault();
+    let content = {
+      "playerName": this.state.playerName,
+      "role": event.target.className
+    }
+    this.state.socket.emit("registerPlayerRole", content)
+  }
+
+  handleClueWordSubmit = event => {
+    event.preventDefault();
+    this.state.socket.emit("clueWordSubmit", this.state.clueWordValue);
+  }
+
+  handleClueWordChange = event => {
+    event.preventDefault();
+    this.setState({clueWordValue:event.target.value})
+  }
+
+
+  previousPage = () => {
     this.setState({ pageNumber: this.state.pageNumber - 1 });
   }
 
-  nextPage = event => {
+  nextPage = () => {
     this.setState({ pageNumber: this.state.pageNumber + 1 });
   }
 
   handleCardClick = event => {
-    this.state.socket.emit('click', event.target.id);
+    event.preventDefault();
+    this.state.socket.emit('cardClicked', event.target.id);
+  }
+
+  handleNameChange = event => {
+    event.preventDefault();
+    this.setState({ playerName: event.target.value});
+  }
+
+  registerPlayer = event => {
+    event.preventDefault();
+    if(!this.state.playerRegistered) {
+      this.state.socket.emit('submitRegisterPlayer', this.state.playerName);
+    }
   }
 
   render () {
     return (
       <div style={styles.screen}>
         <div className="container">
-          {/* {this.state.numPlayers < 4
+          {!this.state.playerRegistered
           ?
-          <CreateGame />
+          <RegisterUserPanel
+            handleNameChange={this.handleNameChange}
+            registerPlayer={this.registerPlayer}
+            playerName={this.state.playerName}
+          />
           :
-          <PlayGame 
-            firstPlayer={this.state.firstPlayer}
-            
-          /> */}
-
+          (this.state.numRegisteredPlayers < 4)
+          ?
+          <WaitingPanel
+            playerName={this.state.playerName}
+            lobbyNames={this.state.lobbyNames}
+            message="Waiting on 4 players to join..."
+          />
+          :
+          (this.state.isFirstPlayer && this.state.packType === '')
+          ?
+          <PackPanel 
+            previousPage={this.previousPage}
+            nextPage={this.nextPage}
+            handlePackSelection={this.handlePackSelection}
+            webPacksPerPage={this.props.webPacksPerPage}
+            pageNumber={this.state.pageNumber}
+            totalPacks={this.state.totalPacks}
+            wordPacks={this.state.wordPacks}
+          />
+          :
+          (this.state.packType === '')
+          ?
+          <WaitingPanel
+            playerName={this.state.playerName}
+            lobbyNames={this.state.lobbyNames}
+            message="Waiting on pack selection"
+          />
+          :
+          (this.state.rolesChosen.length < 4)
+          ?
+          <RolePanel 
+            handleRoleSelection={this.handleRoleSelection}
+            roles={this.state.rolesChosen}
+            playerName={this.state.playerName}
+          />      
+          :
+          <Game
+            firstColor={this.state.firstColor}
+            cards={this.state.cards}
+            socket={this.state.socket}
+            handleCardClick={this.handleCardClick}
+            role={this.state.role}
+            clueWordValue={this.state.clueWordValue}
+            clueWords={this.state.clueWords}
+            handleClueWordSubmit={this.handleClueWordSubmit}
+            handleClueWordChange={this.handleClueWordChange}
+          />
           }
-          <div style={styles.topHalf}>
-            <HorizontalStartIndicator firstPlayer={this.state.firstPlayer} />
-            <VerticalStartIndicator firstPlayer={this.state.firstPlayer}/>
-            <Board toggleColors={this.state.toggleColors} cards={this.state.cards} socket={this.state.socket} handleCardClick={this.handleCardClick}/>
-            <VerticalStartIndicator firstPlayer={this.state.firstPlayer}/>
-            <HorizontalStartIndicator firstPlayer={this.state.firstPlayer} />
-          </div>
-          <div style={styles.bottomHalf}>
-            <div style={styles.webPacks}>
-              <Chevron direction="left" 
-                onClick={this.previousPage} 
-                webPacksPerPage={this.props.webPacksPerPage} 
-                pageNumber={this.state.pageNumber} 
-                totalPacks={this.state.totalPacks}
-              />
-              <WordPackList wordPacks={this.state.wordPacks} onClick={this.handlePacks} webPacksPerPage={this.props.webPacksPerPage} pageNumber={this.state.pageNumber} />
-              <Chevron direction="right"
-                onClick={this.nextPage} 
-                webPacksPerPage={this.props.webPacksPerPage} 
-                pageNumber={this.state.pageNumber} 
-                totalPacks={this.state.totalPacks}
-              />
-            </div>
-            <div style={styles.button}>
-              <div onClick={this.toggleView} className="toggle-view">{this.state.role}</div>
-              <div onClick={this.DeletGames}>Delete Games</div>
-              <div>{this.state.role}</div>
-              <div>{this.state.role}</div>
-            </div>
-          </div>
         </div>
       </div>
     );
@@ -187,43 +295,6 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center"
-  },
-  topHalf: {
-    display: "flex",
-    flexFlow: "row wrap",
-    height: "80%",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  bottomHalf: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    height: "20%"
-  },
-  button: {
-    display: "flex",
-    backgroundColor: "white",
-    width: "25%",
-    height: "50%",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "3px 3px",
-    cursor: "pointer",
-    margin: "5%",
-    overflowWrap: "break-word",
-    userSelect: "none",
-    textAlign: "center",
-    padding: "2.5%",
-  },
-  webPacks: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "60%",
-    margin: "5%",
-    height: "40%"
   }
 };
 

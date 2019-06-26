@@ -11,168 +11,6 @@ app = Flask(__name__)
 CORS(app)
 
 GAMES = {}
-GAMES[321] = {
-                "cards": [
-                    {
-                    "beenClicked": "false",
-                    "color": "tan",
-                    "id": 0,
-                    "word": "nurse"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "red",
-                    "id": 1,
-                    "word": "moscow"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "red",
-                    "id": 2,
-                    "word": "maple"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "blue",
-                    "id": 3,
-                    "word": "olive"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "red",
-                    "id": 4,
-                    "word": "wall"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "tan",
-                    "id": 5,
-                    "word": "ghost"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "tan",
-                    "id": 6,
-                    "word": "van"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "tan",
-                    "id": 7,
-                    "word": "cross"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "blue",
-                    "id": 8,
-                    "word": "server"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "tan",
-                    "id": 9,
-                    "word": "fall"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "blue",
-                    "id": 10,
-                    "word": "gold"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "blue",
-                    "id": 11,
-                    "word": "turkey"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "tan",
-                    "id": 12,
-                    "word": "box"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "tan",
-                    "id": 13,
-                    "word": "war"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "red",
-                    "id": 14,
-                    "word": "eagle"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "red",
-                    "id": 15,
-                    "word": "dwarf"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "blue",
-                    "id": 16,
-                    "word": "rome"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "blue",
-                    "id": 17,
-                    "word": "knife"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "red",
-                    "id": 18,
-                    "word": "angel"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "red",
-                    "id": 19,
-                    "word": "giant"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "black",
-                    "id": 20,
-                    "word": "chocolate"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "red",
-                    "id": 21,
-                    "word": "forest"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "blue",
-                    "id": 22,
-                    "word": "mammoth"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "blue",
-                    "id": 23,
-                    "word": "circle"
-                    },
-                    {
-                    "beenClicked": "false",
-                    "color": "red",
-                    "id": 24,
-                    "word": "rock"
-                    }
-                ],
-                "firstPlayer": "red",
-                "totalPacks": 4,
-                "wordPacks": [
-                    "Sports_Teams",
-                    "Default",
-                    "NSFW",
-                    "Premier_League"
-                ]
-}
 
 def randomColor():
     num = random.randint(0,2)
@@ -222,7 +60,7 @@ def get25words(firstPlayer, packName):
     return returnedElements
 
 
-def getWordPacks():
+def wordPacks():
     path = 'WordPacks'
     files = []
     for _,_,f in os.walk(path):
@@ -231,20 +69,40 @@ def getWordPacks():
                 files.append(file.split(".")[0])
     return files
 
-def makeGame(packName):
+def makeGame(packName, gameId):
     context = {}
     firstPlayer = randomColor()
-    context["firstPlayer"] = firstPlayer["first"]
+    context["firstColor"] = firstPlayer["first"]
     context["cards"] = get25words(firstPlayer, packName)
-    packs = getWordPacks()
-    context["wordPacks"] = packs
-    context["totalPacks"] = len(packs)
+    context["gameId"] = gameId
     return context
     
 
+@app.route("/", methods=["GET"])
+def home():
+    context = {}
+    context["urls"] = [
+        "/api/v1/",
+        "/api/v1/<string:packName>",
+        "/api/v1/createGame/<int:gameId>/<string:packName>",
+        "/api/v1/createGame/<int:gameId>/",
+        "/api/v1/deleteAllGames/"
+    ]
+    return jsonify(**context)
+
+
 @app.route("/api/v1/", methods=["GET"])
 def generateSinglePlayerGame():
-    context = makeGame("Default")
+    context = makeGame("Default", 0)
+    return jsonify(**context)
+
+
+@app.route("/api/v1/wordPacks", methods=["GET"])
+def getWordPacks():
+    context = {}
+    packs = wordPacks()
+    context["wordPacks"] = packs
+    context["totalPacks"] = len(packs)
     return jsonify(**context)
 
 
@@ -256,7 +114,7 @@ def generateMultiplayerGame(packName):
     else:
         firstPlayer = randomColor()
         context = {}
-        context["firstPlayer"] = firstPlayer["first"]
+        context["firstColor"] = firstPlayer["first"]
         context["cards"] = get25words(firstPlayer, packName)
         packs = getWordPacks()
         context["wordPacks"] = packs
@@ -267,7 +125,7 @@ def generateMultiplayerGame(packName):
 def getPackGame(gameId, packName):
     if gameId in GAMES:
         return jsonify(**GAMES[gameId])
-    context = makeGame(packName)
+    context = makeGame(packName, gameId)
     GAMES[gameId] = context
     return jsonify(**context)
 
@@ -275,7 +133,7 @@ def getPackGame(gameId, packName):
 def getDefaultGame(gameId):
     if gameId in GAMES:
         return jsonify(**GAMES[gameId])
-    context = makeGame("Default")
+    context = makeGame("Default", gameId)
     GAMES[gameId] = context
     return jsonify(**context)
 

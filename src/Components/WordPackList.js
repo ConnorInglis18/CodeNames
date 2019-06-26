@@ -5,14 +5,14 @@ import PropTypes from 'prop-types';
 class WordPackList extends Component {
     static propTypes = {
         wordPacks: PropTypes.array.isRequired,
-        onClick: PropTypes.func.isRequired,
+        handlePackSelection: PropTypes.func.isRequired,
         webPacksPerPage: PropTypes.number.isRequired,
         pageNumber: PropTypes.number.isRequired,
       }
     
     render() {
         let wordPacks = this.props.wordPacks.map((data,index) => 
-            <WordPackButton key={index} wordPack={data} onClick={this.props.onClick}/>
+            <WordPackButton key={index} wordPack={data} onClick={this.props.handlePackSelection}/>
         )
 
         let lowerBound = this.props.webPacksPerPage * (this.props.pageNumber-1);

@@ -4,14 +4,14 @@ import Card from './Card.js';
 
 class Board extends Component {
     static propTypes = {
-        toggleColors: PropTypes.bool.isRequired,
         cards: PropTypes.array.isRequired,
         socket: PropTypes.object.isRequired,
         handleCardClick: PropTypes.func.isRequired,
+        role: PropTypes.string.isRequired,
     }
 
     render() {
-
+        let seeColors = this.props.role === "Red_Giver" || this.props.role === "Blue_Giver";
         let coloredCards = this.props.cards.map((data,index) => 
             <Card 
                 key={index}
@@ -38,7 +38,7 @@ class Board extends Component {
         )
         return (
             <React.Fragment>
-                {this.props.toggleColors === true
+                {seeColors
                 ?
                 <div style={styles.card}>{coloredCards}</div>
                 :
