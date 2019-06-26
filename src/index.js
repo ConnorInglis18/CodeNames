@@ -6,7 +6,8 @@ import * as serviceWorker from './serviceWorker';
 
 //const devUrl = "http://localhost:5000/api/v1/"
 const prodUrl = "https://testing-deployment-01.herokuapp.com/api/v1/"
-const socketUrl = "http://localhost:3231"
+//const socketUrl = "http://localhost:3231"
+const socketUrl = "https://sheltered-lake-61775.herokuapp.com/"
 ReactDOM.render(<App url={prodUrl} socketUrl={socketUrl} webPacksPerPage={3} />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
