@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 class RegisterUserPanel extends Component {
   static propTypes = {
-    registerPlayer: PropTypes.func.isRequired,
+    handleNameSubmit: PropTypes.func.isRequired,
     handleNameChange: PropTypes.func.isRequired,
     playerName: PropTypes.string.isRequired
   }
@@ -11,20 +11,18 @@ class RegisterUserPanel extends Component {
   render() {
     return( 
       <div style={styles.container}>
-        <div style={styles.title}>Welcome to CodeNames</div>
-        <div style={styles.credit}>Created by Connor Inglis</div>
-        <form onSubmit={this.props.registerPlayer} style={styles.submit}>
-          <label>
-            <div style={styles.prompt}>Please Enter you Name:</div>
-            <input
-              style={styles.form}
-              type="text" 
-              className="playerNameInput"   
-              value={this.props.playerName}
-              onChange={this.props.handleNameChange} 
-            />
-            {/* <input type = "submit" value = "Submit" /> */}
-          </label>
+        <div className="titleText" style={styles.title}>Welcome to CodeNames</div>
+        <div className="creditText" style={styles.credit}>Created by Connor Inglis</div>
+        <form onSubmit={this.props.handleNameSubmit} style={styles.submit}>
+          <div className="promptText" style={styles.prompt}>Please Enter Your Name:</div>
+          <input
+            style={styles.form}
+            type="text"
+            autoFocus={true}
+            className="playerNameInput"   
+            value={this.props.playerName}
+            onChange={this.props.handleNameChange} 
+          />
         </form>
       </div>
     )
@@ -41,28 +39,27 @@ const styles = {
     justifyContent: "center",
   },
   title: {
-    fontSize: "100px",
     textAlign: "center",
     fontWeight: "bold",
   },
   credit: {
-    fontSize: "20px",
     textAlign: "right",
     marginBottom: "100px",
     marginRight: "40px"
   },
   prompt: {
-    fontSize: "30px"
+    width: "70%",
+    marginRight: "20%"
   },
   submit: {
     display: "flex",
+    flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    width: "100%"
   },
   form: {
-    height: "6vh",
-    width: "30vw",
-    fontSize: "30px",
+    width: "90%",
   }
 }
 

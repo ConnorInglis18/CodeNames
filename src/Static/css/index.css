@@ -11,3 +11,62 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.titleText {
+  font-size: 10vw;
+}
+
+.creditText {
+  font-size: 2vw;
+}
+
+.promptText {
+  font-size: 3vw;
+}
+
+.playerNameInput {
+  font-size: 3vw;
+}
+
+.subtitleText {
+  font-size: 5vw;
+}
+.nameBox {
+  height: 50vw;
+}
+.submitWordBox {
+  width: 15vw;
+  font-size: 1.6vw;
+}
+
+.smallText {
+  font-size: 1.5vw;
+}
+
+@media (min-width: 1000px) {
+  .titleText {
+    font-size: 100px;
+  }
+  .creditText {
+    font-size: 20px;
+  }
+  .promptText {
+    font-size: 30px;
+  }
+  .playerNameInput {
+    font-size: 30px;
+  }
+  .subtitleText {
+    font-size: 50px;
+  }
+  .nameBox {
+    height: 500px;
+  }
+  .submitWordBox {
+    width: 150px;
+    font-size: 16px;
+  }
+  .smallText {
+    font-size: 15px;
+  }
+}

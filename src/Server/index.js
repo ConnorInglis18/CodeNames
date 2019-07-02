@@ -1,8 +1,6 @@
 const io = require('socket.io')();
 
-let players = {};
-let gameId = 0;
-let beenFirstPlayer = false;
+let games = {};
 
 
 const PORT = process.env.PORT || 3231;
@@ -13,66 +11,69 @@ io.on('connection', function(socket) {
   // io.emit sends to everyone
   // socket.emit sends to the indiviual
 
-  if(Object.keys(players).length >= 4) {
-    socket.disconnect();
-  }
+  gameIdRandom = Math.floor(Math.random() * 100000).toString();
+  socket.emit("gameIdRandom", gameIdRandom);
 
-  if(!beenFirstPlayer) {
-    gameId = Math.floor(Math.random() * 100000);
-    socket.emit("firstPlayer", true);
-    socket.emit("message", "you are the first player");
-    beenFirstPlayer = !beenFirstPlayer;
-  }
-
-  socket.emit("gameId", gameId);
-
-  socket.on("submitRegisterPlayer", function(playerName) {
-    players[playerName] = null;
-    socket.emit("registerPlayer", playerName);
-
-    let lobby = [];
-    for (let player in players) {
-      lobby.push(player);
+  socket.on("gameIdRegistered", function(info) {
+    let gameId = info["gameId"];
+    let playerName = info["name"];
+    let isGameMade = gameId in games;
+    if(isGameMade) {
+      if(games[gameId].length >= 4) {
+        socket.emit("tooManyPlayers");
+        socket.disconnect();
+      } else {
+        socket.join(gameId)
+        games[gameId][playerName] = null;
+      }
+    } else {
+      games[gameId] = {};
+      games[gameId][playerName] = null;
+      socket.join(gameId)
+      socket.emit("firstPlayer", true);
     }
-    let info = {
-      "numPlayers": Object.keys(players).length,
-      "lobbyList": lobby
-    }
-    io.emit("playerCount", info);
+    io.in(gameId).emit("playerCount", Object.keys(games[gameId]));
   })
 
-  socket.on("createGameBoard", function(url) {
-    io.emit("createGameBoard", url);
+  socket.on("createGameBoard", function(info) {
+    let gameId = info["gameId"];
+    let url = info["url"];
+    let pack = info["packType"]
+    let content = {"pack":pack, "url":url}
+    io.in(gameId).emit("createGameBoard", content);
   })
 
-  socket.on("registerPlayerRole", function(content) {
-    players[content["playerName"]] = content["role"];
-    socket.emit("registerUserRole", content["role"]);
+  socket.on("registerPlayerRole", function(info) {
+    let gameId = info["gameId"];
+    let role = info["role"];
+    let playerName = info["playerName"];
+    games[gameId][playerName] = role;
+    socket.emit("registerUserRole", role);
     let roles = [];
-    for(let player in players) {
-      if(players[player] !== null) {
-        roles.push(players[player])
+    for(let playerName in games[gameId]) {
+      if(games[gameId][playerName] !== null) {
+        roles.push(games[gameId][playerName])
       }
     }
-    io.emit("registerNewRoll", roles)
+    io.in(gameId).emit("registerNewGameRoll", roles)
   })
 
-  socket.on("cardClicked", function(tileId) {
-    //io.emit("message", tileId);
-    io.emit("cardClicked", tileId);
+  socket.on("cardClicked", function(info) {
+    let gameId = info["gameId"]
+    let tileId = info["tileId"]
+    io.in(gameId).emit("cardClicked", tileId);
   })
 
-  socket.on("clueWordSubmit", function(clueWordValue) {
-    io.emit("clueWordGiven", clueWordValue)
+  socket.on("clueWordSubmit", function(info) {
+    let gameId = info["gameId"]
+    let clueWord = info["clueWord"]
+    io.in(gameId).emit("clueWordGiven", clueWord)
   })
 
   socket.on('disconnect', function () {
     //TODO
     //socket.emit("findWhoDisconnected");
-
-    players = {};
-    beenFirstPlayer = false;
-    gameId = 0;
+    games = {};
 
     // if(Object.keys(players).length === 1) {
     //   socket.emit("deleteAllGames")

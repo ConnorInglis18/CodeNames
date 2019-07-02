@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 class RoleSelector extends Component {
   static propTypes = {
     playerRole: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
     handleRoleSelection: PropTypes.func.isRequired,
     roles: PropTypes.array.isRequired
   }

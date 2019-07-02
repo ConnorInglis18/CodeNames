@@ -7,6 +7,7 @@ import RegisterUserPanel from './RegisterUserPanel.js';
 import WaitingPanel from './WaitingPanel.js';
 import RolePanel from './RolePanel.js';
 import PackPanel from './PackPanel.js';
+import LobbySelection from './LobbySelection.js';
 
 class App extends Component {
   static propTypes = {
@@ -23,9 +24,10 @@ class App extends Component {
       clueWordValue: '',
       firstColor: '',
       gameId: '',
+      gameIdRandom: '',
+      gameIdInput: '',
       isFirstPlayer: false,
       lobbyNames: [],
-      numRegisteredPlayers: 0,
       packType: '',
       pageNumber: 1,
       playerName: '',
@@ -38,53 +40,35 @@ class App extends Component {
       wordPacks: []
     }
 
-    this.state.socket.on('gameId', gameID => {
-      this.setState({ gameId: gameID }, () => {
-        console.log("GameID: " + this.state.gameId);
-      });
-    });
-
-    this.state.socket.on("firstPlayer", _isFirstPlayer => {
-      this.setState({isFirstPlayer: _isFirstPlayer});
-      this.getPacks();
-    });
-
     this.state.socket.on("message", message => {
       console.log("MESSAGE: " + message);
     });
 
-    this.state.socket.on("playerCount", info => {
-      this.setState({
-        numRegisteredPlayers: info["numPlayers"],
-        lobbyNames: info["lobbyList"]
-      });
+    this.state.socket.on('gameIdRandom', gameIdRandom => {
+      this.setState({gameIdRandom: gameIdRandom});
     });
 
-    this.state.socket.on("registerPlayer", name => {
-      this.setState({
-        playerName: name,
-        playerRegistered: true
-      });
+    this.state.socket.on("firstPlayer", isFirstPlayer => {
+      this.setState({isFirstPlayer: isFirstPlayer});
+      this.getPacks();
+    });
+
+    this.state.socket.on("playerCount", lobbyList => {
+      this.setState({lobbyNames: lobbyList});
     });
 
     this.state.socket.on("registerUserRole", playerRole => {
-      this.setState({role:playerRole}, () => {console.log("PLAYER ROLE: " + this.state.role);});
+      this.setState({role:playerRole});
     });
 
-    this.state.socket.on("registerNewRoll", roles => {
-      this.setState({rolesChosen: roles}, () => {
-        console.log("ROLES CHOSEN: " + this.state.rolesChosen);
-      })
+    this.state.socket.on("registerNewGameRoll", roles => {
+      this.setState({rolesChosen: roles});
     })
 
     this.state.socket.on("createGameBoard", content => {
       this.setState({packType: content["pack"]});
       this.getBoard(content["url"]);
     })
-
-    this.state.socket.on("removePlayer", numPlayers => {
-      this.setState({numRegisteredPlayers: numPlayers});
-    });
 
     this.state.socket.on('cardClicked', tileId => {
       const cardsCopy = Object.assign([], this.state.cards);
@@ -160,40 +144,46 @@ class App extends Component {
     .catch(error => console.log(error)); // eslint-disable-line no-console 
   }
 
-  toggleView = event => {
+  // ------REGISTER USER------
+  handleNameChange = event => {
     event.preventDefault();
-    this.setState({
-      toggleColors: !this.state.toggleColors
+    this.setState({playerName: event.target.value});
+  }
+
+  handleNameSubmit = event => {
+    event.preventDefault();
+    if(!this.state.playerRegistered) {
+      this.setState({playerRegistered: true});
+    }
+  }
+
+  // ----LOBBY SELECTION-------
+  handleGameIdChange = event => {
+    event.preventDefault();
+    if(!isNaN(event.target.value) && event.target.value.length <= 5) {
+      this.setState({gameIdInput: event.target.value});
+    }
+  }
+
+  handleGameIdSubmit = event => {
+    event.preventDefault();
+    this.setState({gameId: event.target[0].value}, () => {
+      let info = {
+        "gameId": this.state.gameId,
+        "name": this.state.playerName
+      }
+      this.state.socket.emit("gameIdRegistered", info);
     });
   }
 
+  // ------PACK PANEL-------
   handlePackSelection = event => {
     event.preventDefault();
     let pack = event.target.className;
     let url = this.props.url + "createGame/" + this.state.gameId + "/" + pack;
-    let context = {"url":url,"packType":pack};
+    let context = {"url":url,"gameId":this.state.gameId,"packType":pack};
     this.state.socket.emit("createGameBoard", context);
   }
-
-  handleRoleSelection = event => {
-    event.preventDefault();
-    let content = {
-      "playerName": this.state.playerName,
-      "role": event.target.className
-    }
-    this.state.socket.emit("registerPlayerRole", content)
-  }
-
-  handleClueWordSubmit = event => {
-    event.preventDefault();
-    this.state.socket.emit("clueWordSubmit", this.state.clueWordValue);
-  }
-
-  handleClueWordChange = event => {
-    event.preventDefault();
-    this.setState({clueWordValue:event.target.value})
-  }
-
 
   previousPage = () => {
     this.setState({ pageNumber: this.state.pageNumber - 1 });
@@ -203,21 +193,34 @@ class App extends Component {
     this.setState({ pageNumber: this.state.pageNumber + 1 });
   }
 
+  // ------ROLE PANEL-------
+  handleRoleSelection = event => {
+    event.preventDefault();
+    let content = {
+      "playerName": this.state.playerName,
+      "role": event.target.className,
+      "gameId": this.state.gameId
+    }
+    this.state.socket.emit("registerPlayerRole", content)
+  }
+
+  // ---------GAME----------
+  handleClueWordSubmit = event => {
+    event.preventDefault();
+    let clueWord = `${this.state.playerName}:_${this.state.clueWordValue}`
+    let content = {"gameId":this.state.gameId,"clueWord":clueWord}
+    this.state.socket.emit("clueWordSubmit", content);
+  }
+
+  handleClueWordChange = event => {
+    event.preventDefault();
+    this.setState({clueWordValue:event.target.value})
+  }
+
   handleCardClick = event => {
     event.preventDefault();
-    this.state.socket.emit('cardClicked', event.target.id);
-  }
-
-  handleNameChange = event => {
-    event.preventDefault();
-    this.setState({ playerName: event.target.value});
-  }
-
-  registerPlayer = event => {
-    event.preventDefault();
-    if(!this.state.playerRegistered) {
-      this.state.socket.emit('submitRegisterPlayer', this.state.playerName);
-    }
+    let content = {"gameId":this.state.gameId,"tileId":event.target.id};
+    this.state.socket.emit('cardClicked', content);
   }
 
   render () {
@@ -226,18 +229,40 @@ class App extends Component {
         <div className="container">
           {!this.state.playerRegistered
           ?
+          // <Game
+          //   firstColor={this.state.firstColor}
+          //   cards={this.state.cards}
+          //   socket={this.state.socket}
+          //   handleCardClick={this.handleCardClick}
+          //   role={"Red_Giver"}
+          //   clueWordValue={this.state.clueWordValue}
+          //   clueWords={this.state.clueWords}
+          //   handleClueWordSubmit={this.handleClueWordSubmit}
+          //   handleClueWordChange={this.handleClueWordChange}
+          // />
           <RegisterUserPanel
             handleNameChange={this.handleNameChange}
-            registerPlayer={this.registerPlayer}
+            handleNameSubmit={this.handleNameSubmit}
             playerName={this.state.playerName}
           />
           :
-          (this.state.numRegisteredPlayers < 4)
+          (this.state.gameId === "")
+          ?
+          <LobbySelection
+            gameIdRandom={this.state.gameIdRandom}
+            gameIdInput={this.state.gameIdInput}
+            handleGameIdChange={this.handleGameIdChange}
+            handleGameIdSubmit={this.handleGameIdSubmit}
+          />
+          :
+          (this.state.lobbyNames.length < 4)
           ?
           <WaitingPanel
             playerName={this.state.playerName}
             lobbyNames={this.state.lobbyNames}
-            message="Waiting on 4 players to join..."
+            message={
+            `Waiting on ${4-this.state.lobbyNames.length} players to join...\n\nYour Game ID is: ${this.state.gameId}`
+            }
           />
           :
           (this.state.isFirstPlayer && this.state.packType === '')
@@ -265,7 +290,6 @@ class App extends Component {
           <RolePanel 
             handleRoleSelection={this.handleRoleSelection}
             roles={this.state.rolesChosen}
-            playerName={this.state.playerName}
           />      
           :
           <Game

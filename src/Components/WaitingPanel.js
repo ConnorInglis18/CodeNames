@@ -5,19 +5,19 @@ class WaitingPanel extends Component {
   static propTypes = {
     playerName: PropTypes.string.isRequired,
     lobbyNames: PropTypes.array.isRequired,
-    message: PropTypes.string
+    message: PropTypes.string,
   }
 
   render() {
     let lobby = this.props.lobbyNames.map((name,index) => 
-      <div style={styles.players} key={index}>{name}</div>
+      <div className="subtitleText" key={index}>{name}</div>
     );
 
     return( 
       <div style={styles.waitingScreen}>
-        <h1>Hi {this.props.playerName}</h1>
-        <h2>{this.props.message}</h2>
-        <div style={styles.box}>
+        <div style={styles.subtitle} className="subtitleText">Hi {this.props.playerName}</div>
+        <div style={styles.message} className="promptText">{this.props.message}</div>
+        <div className="nameBox" style={styles.box}>
           {lobby}
         </div>
       </div>
@@ -32,13 +32,20 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center"
   },
-  box: {
-    width: "60%",
-    height: "60vh",
-    backgroundColor: "white"
+  subtitle: {
+    marginTop: "5%",
+    fontWeight: "bold",
   },
-  players: {
-    fontSize: "40px"
+  message: {
+    margin: "2%",
+    width: "80%",
+    whiteSpace: "pre-wrap",
+    textAlign: "center"
+  },
+  box: {
+    width: "50%",
+    backgroundColor: "white",
+    padding: "5%"
   }
 }
 

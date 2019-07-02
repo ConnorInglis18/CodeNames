@@ -6,7 +6,6 @@ class RolePanel extends Component {
   static propTypes = {
     handleRoleSelection: PropTypes.func.isRequired,
     roles: PropTypes.array.isRequired,
-    playerName: PropTypes.string.isRequired
   }
 
   render() {
