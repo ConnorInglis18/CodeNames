@@ -1,3 +1,11 @@
+To Deploy
+
+git add .
+git commit -m "message"
+git push origin master
+npm run predeploy
+npm run deploy
+
 Open two terminals
 
 ### 'npm start' and 'flask run'

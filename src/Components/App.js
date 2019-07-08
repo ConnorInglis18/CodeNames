@@ -181,7 +181,7 @@ class App extends Component {
     event.preventDefault();
     let pack = event.target.className;
     let url = this.props.url + "createGame/" + this.state.gameId + "/" + pack;
-    let context = {"url":url,"gameId":this.state.gameId,"packType":pack};
+    let context = {"url":url,"packType":pack};
     this.state.socket.emit("createGameBoard", context);
   }
 
@@ -198,8 +198,7 @@ class App extends Component {
     event.preventDefault();
     let content = {
       "playerName": this.state.playerName,
-      "role": event.target.className,
-      "gameId": this.state.gameId
+      "role": event.target.className
     }
     this.state.socket.emit("registerPlayerRole", content)
   }
@@ -208,8 +207,7 @@ class App extends Component {
   handleClueWordSubmit = event => {
     event.preventDefault();
     let clueWord = `${this.state.playerName}:_${this.state.clueWordValue}`
-    let content = {"gameId":this.state.gameId,"clueWord":clueWord}
-    this.state.socket.emit("clueWordSubmit", content);
+    this.state.socket.emit("clueWordSubmit", clueWord);
   }
 
   handleClueWordChange = event => {
@@ -219,8 +217,7 @@ class App extends Component {
 
   handleCardClick = event => {
     event.preventDefault();
-    let content = {"gameId":this.state.gameId,"tileId":event.target.id};
-    this.state.socket.emit('cardClicked', content);
+    this.state.socket.emit('cardClicked', event.target.id);
   }
 
   render () {
@@ -229,17 +226,6 @@ class App extends Component {
         <div className="container">
           {!this.state.playerRegistered
           ?
-          // <Game
-          //   firstColor={this.state.firstColor}
-          //   cards={this.state.cards}
-          //   socket={this.state.socket}
-          //   handleCardClick={this.handleCardClick}
-          //   role={"Red_Giver"}
-          //   clueWordValue={this.state.clueWordValue}
-          //   clueWords={this.state.clueWords}
-          //   handleClueWordSubmit={this.handleClueWordSubmit}
-          //   handleClueWordChange={this.handleClueWordChange}
-          // />
           <RegisterUserPanel
             handleNameChange={this.handleNameChange}
             handleNameSubmit={this.handleNameSubmit}
