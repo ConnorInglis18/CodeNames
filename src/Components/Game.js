@@ -34,6 +34,7 @@ class Game extends Component {
     let clueWords = this.props.clueWords.map((data,index) => {
       let name = data.slice(0,data.search("_"));
       let clue = data.slice(data.search("_")+1,data.length);
+      console.log(name)
       return <div key={index} style={styles.clueWord}>
           <div style={styles.name} className="smallText">
             <b>{name}</b>

@@ -8,6 +8,7 @@ import WaitingPanel from './WaitingPanel.js';
 import RolePanel from './RolePanel.js';
 import PackPanel from './PackPanel.js';
 import LobbySelection from './LobbySelection.js';
+//import heartbeats from 'heartbeats'
 
 class App extends Component {
   static propTypes = {
@@ -65,7 +66,7 @@ class App extends Component {
       this.setState({rolesChosen: roles});
     })
 
-    this.state.socket.on("createGameBoard", content => {
+    this.state.socket.on("getGameBoard", content => {
       this.setState({packType: content["pack"]});
       this.getBoard(content["url"]);
     })
@@ -88,13 +89,28 @@ class App extends Component {
       this.deleteAllGames()
     });
 
+    this.state.socket.on("deleteGame", gameId => {
+      let url = this.props.url + "deleteGame/" + gameId;
+      fetch(url)
+      .then((response) => {
+        if (!response.ok) throw Error(response.statusText);
+          return response.json();
+        })
+      .then((data) => {})
+      .catch(error => console.log(error)); // eslint-disable-line no-console 
+    })
+
     this.state.socket.on("tooManyPlayers", () => {
       console.log("Cannot Join Game due to too many players");
     });
+
+    this.state.socket.on("heartbeat", (playerName) => {
+      console.log(playerName)
+    })
   }
 
-  componentWillUnmount() {
-    this.deleteAllGames();
+  componentDidMount() {
+    setInterval(() => setTimeout(() => this.state.socket.emit("heartbeat", "bum bum"), 5000), 5000)
   }
 
   getPacks = () => {
@@ -111,6 +127,22 @@ class App extends Component {
         wordPacks: data.wordPacks,
         totalPacks: data.totalPacks,
       });
+    })
+    .catch(error => console.log(error)); // eslint-disable-line no-console 
+  }
+
+  createBoard = (packType) => {
+    let url = this.props.url + "createGameBoard/" + this.state.gameId + "/" + packType + "/";
+    console.log("CREATING BOARD: ", url);
+    fetch(url)
+    .then((response) => {
+      if (!response.ok) throw Error(response.statusText);
+          return response.json();
+      })
+    .then(() => {
+      let getUrl = this.props.url + "getGameBoard/" + this.state.gameId + "/";
+      let context = {"url":getUrl,"packType":packType};
+      this.state.socket.emit("getGameBoard", context);
     })
     .catch(error => console.log(error)); // eslint-disable-line no-console 
   }
@@ -180,9 +212,10 @@ class App extends Component {
   handlePackSelection = event => {
     event.preventDefault();
     let pack = event.target.className;
-    let url = this.props.url + "createGame/" + this.state.gameId + "/" + pack;
-    let context = {"url":url,"packType":pack};
-    this.state.socket.emit("createGameBoard", context);
+    this.createBoard(pack)
+    // let url = this.props.url + "createGame/" + this.state.gameId + "/" + pack;
+    // let context = {"url":url,"packType":pack};
+    // this.state.socket.emit("createGameBoard", context);
   }
 
   previousPage = () => {
