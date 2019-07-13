@@ -110,7 +110,11 @@ class App extends Component {
   }
 
   componentDidMount() {
-    setInterval(() => setTimeout(() => this.state.socket.emit("heartbeat", "bum bum"), 5000), 5000)
+    setInterval(setTimeout(() => this.state.socket.emit("heartbeat", "bum bum"), 5000), 5000)
+  }
+
+  sendHeartBeat = () => {
+    
   }
 
   getPacks = () => {
