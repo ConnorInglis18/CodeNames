@@ -68,7 +68,7 @@ class App extends Component {
 
     this.state.socket.on("getGameBoard", content => {
       this.setState({packType: content["pack"]});
-      this.getBoard(content["url"]);
+      setTimeout(() => this.getBoard(content["url"]), 500);
     })
 
     this.state.socket.on('cardClicked', tileId => {
