@@ -27,6 +27,7 @@ class App extends Component {
       gameId: '',
       gameIdRandom: '',
       gameIdInput: '',
+      herokuGood: false,
       isFirstPlayer: false,
       lobbyNames: [],
       packType: '',
@@ -109,8 +110,26 @@ class App extends Component {
     })
   }
 
-  componentDidMount() {
-    setInterval(() => this.state.socket.emit("heartbeat", "bum bum"),35000)
+  componentWillMount() {
+    this.checkHerokuPacks()
+    this.interval = setInterval(() => this.state.socket.emit("heartbeat", "bum bum"),35000)
+  }
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  checkHerokuPacks = () => {
+    fetch(this.props.url)
+    .then((response) => {
+      if (!response.ok) throw Error(response.statusText);
+          return response.json();
+      })
+    .then(() => {
+      this.setState({
+        herokuGood: true,
+      });
+    })
+    .catch(() => setTimeout(() => this.setState({herokuGood:true}), 10000))
   }
 
   getPacks = () => {
@@ -257,7 +276,11 @@ class App extends Component {
     return (
       <div style={styles.screen}>
         <div className="container">
-          {!this.state.playerRegistered
+          {!this.state.herokuGood
+          ?
+          <div>HEROKU SUCKS</div>
+          :
+          (!this.state.playerRegistered)
           ?
           <RegisterUserPanel
             handleNameChange={this.handleNameChange}
