@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/CodeNames/static/css/main.c4d4990f.chunk.css",
-    "main.js": "/CodeNames/static/js/main.27606938.chunk.js",
-    "main.js.map": "/CodeNames/static/js/main.27606938.chunk.js.map",
+    "main.js": "/CodeNames/static/js/main.17f24743.chunk.js",
+    "main.js.map": "/CodeNames/static/js/main.17f24743.chunk.js.map",
     "runtime~main.js": "/CodeNames/static/js/runtime~main.11b6010d.js",
     "runtime~main.js.map": "/CodeNames/static/js/runtime~main.11b6010d.js.map",
     "static/js/2.26a329b8.chunk.js": "/CodeNames/static/js/2.26a329b8.chunk.js",
     "static/js/2.26a329b8.chunk.js.map": "/CodeNames/static/js/2.26a329b8.chunk.js.map",
     "index.html": "/CodeNames/index.html",
-    "precache-manifest.32892ee5ba42a968d2d64aac702ce7bb.js": "/CodeNames/precache-manifest.32892ee5ba42a968d2d64aac702ce7bb.js",
+    "precache-manifest.d6be58632b7b65612009e4dd153d919d.js": "/CodeNames/precache-manifest.d6be58632b7b65612009e4dd153d919d.js",
     "service-worker.js": "/CodeNames/service-worker.js",
     "static/css/main.c4d4990f.chunk.css.map": "/CodeNames/static/css/main.c4d4990f.chunk.css.map"
   }
