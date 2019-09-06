@@ -112,13 +112,14 @@ class App extends Component {
 
   componentWillMount() {
     this.checkHerokuPacks()
-    this.interval = setInterval(() => this.state.socket.emit("heartbeat", "bum bum"),35000)
+    this.interval = setInterval(() => this.state.socket.emit("heartbeat", ""),35000)
   }
   componentWillUnmount() {
     clearInterval(this.interval);
   }
 
   checkHerokuPacks = () => {
+    console.log("CHECKING PACKS")
     fetch(this.props.url)
     .then((response) => {
       if (!response.ok) throw Error(response.statusText);
@@ -129,11 +130,15 @@ class App extends Component {
         herokuGood: true,
       });
     })
-    .catch(() => setTimeout(() => this.setState({herokuGood:true}), 10000))
+    .catch(() => setTimeout(() => {
+      console.log("World")
+      this.checkHerokuPacks()
+      console.log("Hello")
+    }, 500))
   }
 
   getPacks = () => {
-    let url = this.props.url + "wordPacks";
+    let url = this.props.url + "getWordPacks";
     console.log(url)
     fetch(url)
     .then((response) => {
@@ -142,6 +147,7 @@ class App extends Component {
           return response.json();
       })
     .then((data) => {
+      console.log(data)
       this.setState({
         wordPacks: data.wordPacks,
         totalPacks: data.totalPacks,
@@ -175,6 +181,7 @@ class App extends Component {
           return response.json();
       })
     .then((data) => {
+      console.log("DATA FROM GetBoard", data)
       this.setState({
         cards: data.cards,
         firstColor: data.firstColor,
@@ -278,7 +285,7 @@ class App extends Component {
         <div className="container">
           {!this.state.herokuGood
           ?
-          <div>HEROKU SUCKS</div>
+          <div style={{display: "flex", alignItems: "center", justifyContent: "center", height: "100vh"}}>Loading CodeNames...</div>
           :
           (!this.state.playerRegistered)
           ?
